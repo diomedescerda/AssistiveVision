@@ -3,6 +3,7 @@ package com.unimagdalena.assistivevision.ui
 import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -17,7 +18,7 @@ import com.unimagdalena.assistivevision.viewmodel.MainViewModel
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
-    private lateinit var captureModule: CaptureModule
+    private var captureModule: CaptureModule? = null
     private val viewModel: MainViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -47,7 +48,7 @@ class MainActivity : AppCompatActivity() {
         captureModule = CaptureModule(this, this) { bitmap ->
             viewModel.processFrame(bitmap)
         }
-        captureModule.start(binding.previewView)
+        captureModule?.start(binding.previewView)
     }
 
     override fun onRequestPermissionsResult(
@@ -58,12 +59,14 @@ class MainActivity : AppCompatActivity() {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == 100 && grantResults.firstOrNull() == PackageManager.PERMISSION_GRANTED) {
             startCamera()
+        } else {
+            Toast.makeText(this, "Camera permission is required", Toast.LENGTH_LONG).show()
         }
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        captureModule.shutdown()
+        captureModule?.shutdown()
     }
 
     private fun allPermissionsGranted() =
