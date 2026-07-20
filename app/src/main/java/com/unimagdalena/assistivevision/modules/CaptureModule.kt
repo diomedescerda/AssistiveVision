@@ -2,6 +2,7 @@ package com.unimagdalena.assistivevision.modules
 
 import android.content.Context
 import android.graphics.Bitmap
+import android.util.Log
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.Preview
@@ -43,6 +44,7 @@ class CaptureModule (
                 .build()
 
             imageAnalysis.setAnalyzer(cameraExecutor) { imageProxy ->
+                Log.d("CaptureModule", "Frame received: ${imageProxy.width}x${imageProxy.height}")
                 val bitmap = imageProxy.toBitmap()
                 onFrameReady(bitmap)
                 imageProxy.close()

@@ -5,13 +5,13 @@ plugins {
 android {
     namespace = "com.unimagdalena.assistivevision"
     compileSdk {
-        version = release(36) {
+        version = release(37) {
             minorApiLevel = 1
         }
     }
 
     defaultConfig {
-        applicationId = "com.pasantia.assistivevision"
+        applicationId = "com.unimagdalena.assistivevision"
         minSdk = 26
         targetSdk = 36
         versionCode = 1
