@@ -35,7 +35,7 @@ class DetectionModule(context: Context) {
     }
 
     init {
-        val model = loadModelFile(context.assets, "efficientdet-lite2-detection-metadata.tflite")
+        val model = loadModelFile(context.assets)
         interpreter = Interpreter(model)
         maxModelDetections = interpreter.getOutputTensor(0).shape()[1]
     }
@@ -56,12 +56,15 @@ class DetectionModule(context: Context) {
         Log.d("DetectionModule", "Raw detections: $numDetections")
 
         return (0 until numDetections)
+            .asSequence()
             .filter { scores[0][it] >= CONFIDENCE_THRESHOLD }
+            .filter { TARGET_LABELS.containsKey(classes[0][it].toInt() + 1) }
             .map { i ->
-                val classId = classes[0][i].toInt() + 1 // model outputs 0-indexed, add 1 for COCO ID
+                val classId = classes[0][i].toInt() + 1
+                Log.d("DetectionModule", "classId raw=${classes[0][i]} adjusted=$classId label=${TARGET_LABELS[classId]}")
                 Detection(
                     classId = classId,
-                    className = TARGET_LABELS[classId] ?: "unknown",
+                    className = TARGET_LABELS[classId]!!,
                     score = scores[0][i],
                     bbox = RectF(
                         boxes[0][i][1] * INPUT_SIZE,  // xmin
@@ -71,13 +74,13 @@ class DetectionModule(context: Context) {
                     )
                 )
             }
-            .filter { it.className != "unknown" }
             .sortedByDescending { it.score }
             .take(MAX_DETECTIONS)
+            .toList()
     }
 
-    private fun loadModelFile(assets: AssetManager, filename: String): MappedByteBuffer {
-        val fd = assets.openFd(filename)
+    private fun loadModelFile(assets: AssetManager): MappedByteBuffer {
+        val fd = assets.openFd("efficientdet-lite2-detection-metadata.tflite")
         val stream = FileInputStream(fd.fileDescriptor)
         val channel = stream.channel
         return channel.map(FileChannel.MapMode.READ_ONLY, fd.startOffset, fd.declaredLength)
