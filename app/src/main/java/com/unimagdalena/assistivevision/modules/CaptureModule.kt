@@ -17,7 +17,7 @@ import java.util.concurrent.Executors
 class CaptureModule (
     private val context: Context,
     private val lifecycleOwner: LifecycleOwner,
-    private val maxFps: Int = 8,
+    private val maxFps: Int = 9, // efficientdet-lite2 benchmarks at ~8.55 fps
     private val onFrameReady: (Bitmap) -> Unit
 ) {
     private val cameraExecutor = Executors.newSingleThreadExecutor()
