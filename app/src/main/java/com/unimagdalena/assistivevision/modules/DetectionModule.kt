@@ -13,11 +13,11 @@ import java.nio.channels.FileChannel
 
 class DetectionModule(context: Context) {
     private val interpreter: Interpreter
+    private val maxModelDetections: Int
 
     companion object {
         const val CONFIDENCE_THRESHOLD = 0.30f // tune as needed
         const val MAX_DETECTIONS = 15          // tune as needed
-        // could be good to have like the best 15 IoUs or something
         const val INPUT_SIZE = 448
         val LABELS = listOf(
             "person", "chair", "couch", "bed", "tv",
@@ -28,12 +28,13 @@ class DetectionModule(context: Context) {
     init {
         val model = loadModelFile(context.assets, "efficientdet-lite2-detection-metadata.tflite")
         interpreter = Interpreter(model)
+        maxModelDetections = interpreter.getOutputTensor(0).shape()[1]
     }
 
     fun detect(inputBuffer: ByteBuffer): List<Detection> {
-        val boxes = Array(1) { Array(MAX_DETECTIONS) { FloatArray(4) } }
-        val classes = Array(1) { FloatArray(MAX_DETECTIONS) }
-        val scores = Array(1) { FloatArray(MAX_DETECTIONS) }
+        val boxes = Array(1) { Array(maxModelDetections) { FloatArray(4) } }
+        val classes = Array(1) { FloatArray(maxModelDetections) }
+        val scores = Array(1) { FloatArray(maxModelDetections) }
         val count = FloatArray(1)
 
         interpreter.runForMultipleInputsOutputs(
@@ -41,7 +42,7 @@ class DetectionModule(context: Context) {
             mapOf(0 to boxes, 1 to classes, 2 to scores, 3 to count)
         )
 
-        val numDetections = count[0].toInt().coerceAtMost(MAX_DETECTIONS)
+        val numDetections = count[0].toInt().coerceAtMost(maxModelDetections)
 
         Log.d("DetectionModule", "Raw detections: $numDetections")
 
