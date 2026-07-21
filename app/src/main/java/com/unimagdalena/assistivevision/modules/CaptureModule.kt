@@ -17,9 +17,12 @@ import java.util.concurrent.Executors
 class CaptureModule (
     private val context: Context,
     private val lifecycleOwner: LifecycleOwner,
+    private val maxFps: Int = 8,
     private val onFrameReady: (Bitmap) -> Unit
 ) {
     private val cameraExecutor = Executors.newSingleThreadExecutor()
+    private var lastFrameTime = 0L
+    private val frameIntervalMs get() = 1000L / maxFps
 
     fun start(previewView: PreviewView? = null) {
         val cameraProviderFuture = ProcessCameraProvider.getInstance(context)
@@ -44,9 +47,13 @@ class CaptureModule (
                 .build()
 
             imageAnalysis.setAnalyzer(cameraExecutor) { imageProxy ->
-                Log.d("CaptureModule", "Frame received: ${imageProxy.width}x${imageProxy.height}")
-                val bitmap = imageProxy.toBitmap()
-                onFrameReady(bitmap)
+                val now = System.currentTimeMillis()
+                if (now - lastFrameTime >= frameIntervalMs) {
+                    lastFrameTime = now
+                    Log.d("CaptureModule", "Frame received: ${imageProxy.width}x${imageProxy.height}")
+                    val bitmap = imageProxy.toBitmap()
+                    onFrameReady(bitmap)
+                }
                 imageProxy.close()
             }
 
