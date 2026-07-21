@@ -47,6 +47,7 @@ class MainActivity : AppCompatActivity() {
                     detections.forEach {
                         Log.d("MainActivity", "  ${it.className} (${it.score}) [${it.zone}]")
                     }
+                    binding.overlayView.setDetections(detections)
                 }
             }
         }
