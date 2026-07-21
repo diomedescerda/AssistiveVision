@@ -19,6 +19,7 @@ class PreprocessingModule(private val inputSize: Int = 448) {
         val resized = letterboxResize(bitmap)
         val pixels = IntArray(resized.width * resized.height)
         resized.getPixels(pixels, 0, resized.width, 0, 0, resized.width, resized.height)
+        resized.recycle()
         for (pixel in pixels) {
             inputBuffer.put((pixel shr 16 and 0xFF).toByte()) // R
             inputBuffer.put((pixel shr 8 and 0xFF).toByte())  // G
@@ -41,6 +42,7 @@ class PreprocessingModule(private val inputSize: Int = 448) {
         canvas.drawColor(Color.rgb(114, 114, 114))
         val resized = bitmap.scale(dstW, dstH)
         canvas.drawBitmap(resized, dx.toFloat(), dy.toFloat(), null)
+        resized.recycle()
         return output
     }
 }
