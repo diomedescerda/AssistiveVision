@@ -3,6 +3,7 @@ package com.unimagdalena.assistivevision.ui
 import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
@@ -11,10 +12,14 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.unimagdalena.assistivevision.R
 import com.unimagdalena.assistivevision.databinding.ActivityMainBinding
 import com.unimagdalena.assistivevision.modules.CaptureModule
 import com.unimagdalena.assistivevision.viewmodel.MainViewModel
+import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
@@ -31,6 +36,19 @@ class MainActivity : AppCompatActivity() {
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
+        }
+
+        viewModel.initialize(this)
+
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.detections.collect { detections ->
+                    Log.d("MainActivity", "Detections: ${detections.size}")
+                    detections.forEach {
+                        Log.d("MainActivity", "  ${it.className} (${it.score})")
+                    }
+                }
+            }
         }
 
         if(allPermissionsGranted()) {
