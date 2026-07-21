@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">AssistiveVision</string>
+
+    <!-- Zone labels (Spanish) -->
+    <string name="zone_left_top">arriba a la izquierda</string>
+    <string name="zone_left_bottom">abajo a la izquierda</string>
+    <string name="zone_center_top">arriba al centro</string>
+    <string name="zone_center_bottom">frente a ti</string>
+    <string name="zone_right_top">arriba a la derecha</string>
+    <string name="zone_right_bottom">abajo a la derecha</string>
+</resources>

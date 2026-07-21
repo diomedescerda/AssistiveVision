@@ -45,7 +45,7 @@ class MainActivity : AppCompatActivity() {
                 viewModel.detections.collect { detections ->
                     Log.d("MainActivity", "Detections: ${detections.size}")
                     detections.forEach {
-                        Log.d("MainActivity", "  ${it.className} (${it.score})")
+                        Log.d("MainActivity", "  ${it.className} (${it.score}) [${it.zone}]")
                     }
                 }
             }

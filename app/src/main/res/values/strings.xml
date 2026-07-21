@@ -1,3 +1,11 @@
 <resources>
     <string name="app_name">AssistiveVision</string>
+
+    <!-- Zone labels (English) -->
+    <string name="zone_left_top">upper left</string>
+    <string name="zone_left_bottom">lower left</string>
+    <string name="zone_center_top">centered above</string>
+    <string name="zone_center_bottom">in front of you</string>
+    <string name="zone_right_top">upper right</string>
+    <string name="zone_right_bottom">lower right</string>
 </resources>
