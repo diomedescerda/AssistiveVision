@@ -19,9 +19,18 @@ class DetectionModule(context: Context) {
         const val CONFIDENCE_THRESHOLD = 0.30f // tune as needed
         const val MAX_DETECTIONS = 15          // tune as needed
         const val INPUT_SIZE = 448
-        val LABELS = listOf(
-            "person", "chair", "couch", "bed", "tv",
-            "sink", "toilet", "computer", "refrigerator", "table"
+        // COCO class ID → label name (model outputs 0-indexed, add 1 for COCO ID)
+        val TARGET_LABELS = mapOf(
+            1 to "person",
+            62 to "chair",
+            63 to "couch",
+            65 to "bed",
+            67 to "table",
+            70 to "toilet",
+            72 to "tv",
+            73 to "computer",
+            81 to "sink",
+            82 to "refrigerator"
         )
     }
 
@@ -49,9 +58,10 @@ class DetectionModule(context: Context) {
         return (0 until numDetections)
             .filter { scores[0][it] >= CONFIDENCE_THRESHOLD }
             .map { i ->
+                val classId = classes[0][i].toInt() + 1 // model outputs 0-indexed, add 1 for COCO ID
                 Detection(
-                    classId = classes[0][i].toInt(),
-                    className = LABELS.getOrElse(classes[0][i].toInt()) { "unknown" },
+                    classId = classId,
+                    className = TARGET_LABELS[classId] ?: "unknown",
                     score = scores[0][i],
                     bbox = RectF(
                         boxes[0][i][1] * INPUT_SIZE,  // xmin
@@ -61,6 +71,9 @@ class DetectionModule(context: Context) {
                     )
                 )
             }
+            .filter { it.className != "unknown" }
+            .sortedByDescending { it.score }
+            .take(MAX_DETECTIONS)
     }
 
     private fun loadModelFile(assets: AssetManager, filename: String): MappedByteBuffer {
