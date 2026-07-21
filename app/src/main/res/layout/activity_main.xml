@@ -14,4 +14,25 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
 
+    <ImageButton
+        android:id="@+id/modeToggle"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:layout_gravity="top|end"
+        android:layout_margin="16dp"
+        android:background="@drawable/circle_background"
+        android:src="@drawable/ic_automatic"
+        android:scaleType="centerInside"
+        android:contentDescription="@string/toggle_detection_mode"/>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/captureButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|center"
+        android:layout_margin="32dp"
+        android:src="@drawable/ic_camera"
+        android:visibility="gone"
+        android:contentDescription="@string/capture_frame"/>
+
 </FrameLayout>
