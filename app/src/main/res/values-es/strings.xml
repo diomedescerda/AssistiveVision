@@ -8,4 +8,8 @@
     <string name="zone_center_bottom">frente a ti</string>
     <string name="zone_right_top">arriba a la derecha</string>
     <string name="zone_right_bottom">abajo a la derecha</string>
+
+    <!-- UI labels (Spanish) -->
+    <string name="toggle_detection_mode">Cambiar modo de detección</string>
+    <string name="capture_frame">Capturar fotograma</string>
 </resources>

@@ -8,4 +8,8 @@
     <string name="zone_center_bottom">in front of you</string>
     <string name="zone_right_top">upper right</string>
     <string name="zone_right_bottom">lower right</string>
+
+    <!-- UI labels (English) -->
+    <string name="toggle_detection_mode">Toggle detection mode</string>
+    <string name="capture_frame">Capture frame</string>
 </resources>
