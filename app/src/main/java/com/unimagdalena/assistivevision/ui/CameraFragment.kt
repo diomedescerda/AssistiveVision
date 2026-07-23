@@ -39,6 +39,7 @@ class CameraFragment : Fragment() {
         setupCamera()
         setupListeners()
         observeViewModel()
+        setMode(true)
     }
 
     private fun setupCamera() {
@@ -93,12 +94,14 @@ class CameraFragment : Fragment() {
 
     private fun setMode(automatic: Boolean) {
         isAutomatic = automatic
-        binding.btnAutomatic.setBackgroundResource(
-            if (automatic) R.drawable.toggle_selected_bg else android.R.color.transparent
-        )
-        binding.btnManual.setBackgroundResource(
-            if (!automatic) R.drawable.toggle_selected_bg else android.R.color.transparent
-        )
+        binding.btnAutomatic.apply {
+            setBackgroundResource(if (automatic) R.drawable.toggle_selected_bg else android.R.color.transparent)
+            backgroundTintList = null
+        }
+        binding.btnManual.apply {
+            setBackgroundResource(if (!automatic) R.drawable.toggle_selected_bg else android.R.color.transparent)
+            backgroundTintList = null
+        }
         binding.btnAutomatic.setTextColor(
             if (automatic) 0xFFFFFFFF.toInt() else 0x66FFFFFF.toInt()
         )

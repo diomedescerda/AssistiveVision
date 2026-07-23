@@ -128,7 +128,9 @@
                 android:text="@string/mode_automatic"
                 android:textSize="13sp"
                 android:background="@drawable/toggle_selected_bg"
-                android:textColor="#FFFFFF" />
+                android:textColor="#FFFFFF"
+                android:stateListAnimator="@null"
+                app:backgroundTint="@null" />
 
             <Button
                 android:id="@+id/btnManual"
@@ -137,8 +139,10 @@
                 android:layout_weight="1"
                 android:text="@string/mode_manual"
                 android:textSize="13sp"
-                android:background="@null"
-                android:textColor="#66FFFFFF" />
+                android:background="@android:color/transparent"
+                android:textColor="#66FFFFFF"
+                android:stateListAnimator="@null"
+                app:backgroundTint="@null" />
 
         </LinearLayout>
 
