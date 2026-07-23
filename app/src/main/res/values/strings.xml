@@ -12,4 +12,23 @@
     <!-- UI labels (English) -->
     <string name="toggle_detection_mode">Toggle detection mode</string>
     <string name="capture_frame">Capture frame</string>
+    <string name="detecting">detecting…</string>
+    <string name="no_detections">no detections</string>
+    <string name="toggle_fullscreen">Toggle fullscreen</string>
+    <string name="app_icon">App icon</string>
+    <string name="status_active">● active</string>
+    <string name="mode_automatic">Automatic</string>
+    <string name="mode_manual">Manual</string>
+    <string name="status_text_detecting">detecting</string>
+    <string name="status_text_paused">paused</string>
+    <string name="objects_count">%d objects</string>
+    <string name="status_fps">detecting · %.1f fps</string>
+    <string name="action_speak">Speak</string>
+    <string name="action_pause">Pause</string>
+    <string name="action_resume">Resume</string>
+    <string name="action_settings">Settings</string>
+
+    <!-- Settings (English) -->
+    <string name="settings_title">Settings</string>
+    <string name="settings_language">Language</string>
 </resources>
