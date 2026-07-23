@@ -117,6 +117,9 @@ class CameraFragment : Fragment() {
         viewModel.detectionCount.observe(viewLifecycleOwner) { count ->
             binding.objectCount.text = getString(R.string.objects_count, count)
         }
+        viewModel.detections.observe(viewLifecycleOwner) { detections ->
+            binding.overlayView.setDetections(detections)
+        }
         viewModel.zoneLabel.observe(viewLifecycleOwner) { label ->
             binding.zoneLabel.text = label
         }

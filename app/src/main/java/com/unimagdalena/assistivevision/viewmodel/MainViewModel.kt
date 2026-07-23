@@ -7,6 +7,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.unimagdalena.assistivevision.R
+import com.unimagdalena.assistivevision.model.Detection
 import com.unimagdalena.assistivevision.modules.DetectionModule
 import com.unimagdalena.assistivevision.modules.LocalizationModule
 import com.unimagdalena.assistivevision.modules.PreprocessingModule
@@ -32,6 +33,9 @@ class MainViewModel : ViewModel() {
 
     private val _fps = MutableLiveData(0f)
     val fps: LiveData<Float> = _fps
+
+    private val _detections = MutableLiveData<List<Detection>>(emptyList())
+    val detections: LiveData<List<Detection>> = _detections
 
     private var lastFrameTime = System.currentTimeMillis()
     private val pipelineMutex = Mutex()
@@ -73,6 +77,7 @@ class MainViewModel : ViewModel() {
                 )
 
                 _detectionCount.postValue(localized.size)
+                _detections.postValue(localized)
                 _fps.postValue(currentFps)
 
                 if (localized.isNotEmpty()) {
