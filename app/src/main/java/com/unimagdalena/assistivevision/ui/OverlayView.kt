@@ -14,16 +14,18 @@ class OverlayView(context: Context, attrs: AttributeSet?) : View(context, attrs)
 
     private var detections: List<Detection> = emptyList()
 
+    private val boxColor = 0xFF1D9E75.toInt()
+
     private val boxPaint = Paint().apply {
         style = Paint.Style.STROKE
-        color = Color.RED
+        color = boxColor
         strokeWidth = 4f
         isAntiAlias = true
     }
 
     private val tagPaint = Paint().apply {
         style = Paint.Style.FILL
-        color = Color.RED
+        color = boxColor
         isAntiAlias = true
     }
 
@@ -36,6 +38,9 @@ class OverlayView(context: Context, attrs: AttributeSet?) : View(context, attrs)
 
     private val textPadding = 8f
     private val tagCornerRadius = 12f
+    private val boxCornerRadius = 16f
+    private val boxRect = RectF()
+    private val tagRect = RectF()
     private val inputSize = 448
 
     fun setDetections(detections: List<Detection>) {
@@ -55,23 +60,20 @@ class OverlayView(context: Context, attrs: AttributeSet?) : View(context, attrs)
             val right = d.bbox.right * scaleX
             val bottom = d.bbox.bottom * scaleY
 
-            canvas.drawRect(left, top, right, bottom, boxPaint)
+            boxRect.set(left, top, right, bottom)
+            canvas.drawRoundRect(boxRect, boxCornerRadius, boxCornerRadius, boxPaint)
 
             val label = "${d.className} ${(d.score * 100).toInt()}%"
             val textWidth = textPaint.measureText(label)
             val textHeight = textPaint.fontMetrics.bottom - textPaint.fontMetrics.top
             val tagWidth = textWidth + textPadding * 2
             val tagHeight = textHeight + textPadding * 2
-            val tagLeft = left
-            val tagTop = top - tagHeight
-            val tagRight = left + tagWidth
-            val tagBottom = top
 
-            val tagRect = RectF(tagLeft, tagTop, tagRight, tagBottom)
+            tagRect.set(left, top - tagHeight, left + tagWidth, top)
             canvas.drawRoundRect(tagRect, tagCornerRadius, tagCornerRadius, tagPaint)
 
-            val textX = tagLeft + (tagWidth - textWidth) / 2
-            val textY = tagBottom - textPadding - textPaint.fontMetrics.descent
+            val textX = left + (tagWidth - textWidth) / 2
+            val textY = top - textPadding - textPaint.fontMetrics.descent
             canvas.drawText(label, textX, textY, textPaint)
         }
     }
