@@ -1,25 +1,30 @@
 # AssistiveVision
 
-An Android application that provides real-time object detection assistance for visually impaired users. The app uses the device camera to detect objects in the environment and provides audio feedback about what's in front of the user.
+An Android application that provides real-time object detection assistance for visually impaired users. The app uses the device camera to detect objects in the environment and provides spatial localization with multi-language support.
 
 ## About
 
-AssistiveVision leverages on-device machine learning to help visually impaired individuals navigate their surroundings independently. Using EfficientDet-Lite2 for real-time object detection, the app identifies everyday objects like people, chairs, tables, and more, then provides spoken feedback about their location and proximity. The system is designed for chest-mounted use in landscape orientation, capturing the user's natural field of view as they move through indoor environments.
+AssistiveVision leverages on-device machine learning to help visually impaired individuals navigate their surroundings independently. Using EfficientDet-Lite2 for real-time object detection, the app identifies everyday objects like people, chairs, tables, and more, then displays bounding boxes and spoken feedback about their location. The system is designed for immersive full-screen use, capturing the user's natural field of view as they move through indoor environments.
 
 ## Features
 
 - **Real-time object detection** using EfficientDet-Lite2 TFLite model
 - **Camera integration** with CameraX for live preview and frame analysis
 - **10 target object classes**: person, chair, couch, bed, table, toilet, tv, computer, sink, refrigerator
-- **Optimized inference pipeline** with 9 FPS cap to match model throughput
-- **Modular architecture** with dedicated modules for capture, preprocessing, and detection
+- **Detection overlay** with teal-colored bounding boxes and label tags
+- **AUTO / MANUAL modes** — continuous detection or on-demand capture
+- **Spatial localization** — zones like "center bottom", "left top" etc.
+- **Multi-language support** — English and Spanish via Android string resources
+- **Immersive full-screen** — system bars hidden, edge-to-edge layout
+- **Pipeline mutex** — skips frames if the pipeline is busy, matching CameraX KEEP_ONLY_LATEST strategy
+- **Optimized inference pipeline** with 9 FPS cap and bitmap recycling to reduce GC pressure
 
 ## Architecture
 
-The app follows a modular pipeline architecture:
+The app follows a fragment-based MVVM architecture:
 
 ```
-CameraX Capture → Preprocessing → TFLite Detection → Audio Output
+CameraX Capture → Preprocessing → TFLite Detection → Localization → Overlay / Audio
 ```
 
 ### Modules
@@ -27,15 +32,27 @@ CameraX Capture → Preprocessing → TFLite Detection → Audio Output
 | Module | Description |
 |--------|-------------|
 | `CaptureModule` | CameraX integration with configurable frame rate (9 FPS) |
-| `PreprocessingModule` | Letterbox resize to 448x448 with RGB tensor conversion |
-| `DetectionModule` | TFLite EfficientDet-Lite2 inference with COCO class mapping |
+| `PreprocessingModule` | Letterbox resize to 448x448 with RGB tensor conversion and bitmap recycling |
+| `DetectionModule` | TFLite EfficientDet-Lite2 inference with COCO class mapping and confidence filtering |
+| `LocalizationModule` | Spatial zone computation (left/center/right × top/bottom) |
+
+### UI
+
+| Component | Description |
+|-----------|-------------|
+| `MainActivity` | Edge-to-edge immersive host with Navigation Component |
+| `CameraFragment` | Camera preview, overlay, mode toggle, status bar, and action buttons |
+| `SettingsFragment` | Language selection via Spinner |
+| `OverlayView` | Custom View drawing teal bounding boxes and label tags over detections |
 
 ### Data Flow
 
 1. **CaptureModule** captures frames at 9 FPS using CameraX ImageAnalysis
-2. **PreprocessingModule** converts frames to 448x448 uint8 tensors with letterbox padding
-3. **DetectionModule** runs EfficientDet-Lite2 inference, outputs detections with class labels and confidence scores
-4. **MainViewModel** exposes detections via Kotlin StateFlow to the UI layer
+2. **PreprocessingModule** converts frames to 448x448 uint8 tensors with letterbox padding (recycles intermediate bitmaps)
+3. **DetectionModule** runs EfficientDet-Lite2 inference, filters to target COCO classes
+4. **LocalizationModule** assigns spatial zones to each detection
+5. **MainViewModel** exposes detections, zone labels, FPS, and detection count via LiveData
+6. **CameraFragment** observes LiveData and updates the OverlayView and status UI
 
 ## Tech Stack
 
@@ -43,7 +60,9 @@ CameraX Capture → Preprocessing → TFLite Detection → Audio Output
 - **Camera**: CameraX 1.6.1
 - **ML Framework**: TensorFlow Lite 2.16.1
 - **Model**: EfficientDet-Lite2 (efficientdet-lite2-detection-metadata.tflite)
-- **Architecture**: MVVM with ViewModel and StateFlow
+- **Navigation**: Navigation Component 2.7.7
+- **Architecture**: MVVM with ViewModel and LiveData
+- **UI**: Fragment-based with View Binding
 - **Min SDK**: 26 (Android 8.0)
 - **Target SDK**: 36
 - **Compile SDK**: 37
@@ -66,14 +85,20 @@ Based on benchmark testing on Snapdragon 685:
 app/src/main/java/com/unimagdalena/assistivevision/
 ├── modules/
 │   ├── CaptureModule.kt          # Camera capture and frame delivery
-│   ├── PreprocessingModule.kt    # Image preprocessing and tensor conversion
-│   └── DetectionModule.kt        # TFLite inference and object detection
+│   ├── PreprocessingModule.kt    # Image preprocessing, tensor conversion, bitmap recycling
+│   ├── DetectionModule.kt        # TFLite inference, COCO class mapping, confidence filtering
+│   ├── LocalizationModule.kt     # Spatial zone computation
+│   ├── AudioModule.kt            # (placeholder) Text-to-speech output
+│   └── PriorityFilterModule.kt   # (placeholder) Detection prioritization
 ├── viewmodel/
-│   └── MainViewModel.kt          # Business logic and state management
+│   └── MainViewModel.kt          # Pipeline orchestration, LiveData, mutex concurrency
 ├── model/
-│   └── Detection.kt              # Detection data class
+│   └── Detection.kt              # Detection data class (classId, className, score, bbox, zone)
 └── ui/
-    └── MainActivity.kt           # Main activity with camera preview
+    ├── MainActivity.kt           # Immersive edge-to-edge host, permission handling
+    ├── CameraFragment.kt         # Camera preview, overlay, mode toggle, status UI
+    ├── SettingsFragment.kt       # Language selection
+    └── OverlayView.kt            # Custom View drawing detection boxes and labels
 ```
 
 ## Getting Started
@@ -100,8 +125,9 @@ app/src/main/java/com/unimagdalena/assistivevision/
 ### Usage
 
 1. Grant camera permission when prompted
-2. Point the camera at objects in your environment
-3. The app will detect objects and display them in the debug log
+2. The app starts in AUTO mode — point the camera at objects and detection boxes appear in real time
+3. Switch to MANUAL mode to capture frames on demand using the Speak button
+4. Access Settings to change the language
 
 ## Configuration
 
