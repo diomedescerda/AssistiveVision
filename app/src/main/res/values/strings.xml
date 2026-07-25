@@ -31,4 +31,36 @@
     <!-- Settings (English) -->
     <string name="settings_title">Settings</string>
     <string name="settings_language">Language</string>
+    <string name="settings_back">Back</string>
+    <string name="settings_section_audio">AUDIO</string>
+    <string name="settings_language_desc">Language used for audio descriptors</string>
+    <string name="settings_speech_rate">Speech rate</string>
+    <string name="settings_speech_rate_desc">Speed of audio descriptor playback</string>
+    <string name="settings_speech_rate_value">1.0x</string>
+    <string name="settings_speech_rate_min">0.5x</string>
+    <string name="settings_speech_rate_max">2.5x</string>
+    <string name="settings_section_detection">DETECTION</string>
+    <string name="settings_cooldown">Cooldown interval</string>
+    <string name="settings_cooldown_value">2.0s</string>
+    <string name="settings_cooldown_desc">Minimum time between announcements of the same object</string>
+    <string name="settings_cooldown_min">0.5s</string>
+    <string name="settings_cooldown_max">5.0s</string>
+    <string name="settings_confidence">Confidence threshold</string>
+    <string name="settings_confidence_value">0.30</string>
+    <string name="settings_confidence_desc">Minimum confidence score to announce a detection</string>
+    <string name="settings_confidence_min">0.10</string>
+    <string name="settings_confidence_max">0.90</string>
+    <string name="settings_max_objects">Max objects per cycle</string>
+    <string name="settings_max_objects_desc">Maximum number of objects announced simultaneously</string>
+    <string name="settings_max_objects_1">1</string>
+    <string name="settings_max_objects_2">2</string>
+    <string name="settings_max_objects_3">3</string>
+    <string name="settings_section_behaviour">BEHAVIOUR</string>
+    <string name="settings_auto_mode">Start in automatic mode</string>
+    <string name="settings_auto_mode_desc">Default detection mode when app opens</string>
+    <string name="settings_show_preview">Show camera preview</string>
+    <string name="settings_show_preview_desc">Display live camera feed on screen</string>
+    <string name="settings_speech_rate_display">%1$.1fx</string>
+    <string name="settings_cooldown_display">%1$.1fs</string>
+    <string name="settings_confidence_display">%1$.2f</string>
 </resources>

@@ -31,4 +31,36 @@
     <!-- Settings (Spanish) -->
     <string name="settings_title">Configuración</string>
     <string name="settings_language">Idioma</string>
+    <string name="settings_back">Atrás</string>
+    <string name="settings_section_audio">AUDIO</string>
+    <string name="settings_language_desc">Idioma usado para descriptores de audio</string>
+    <string name="settings_speech_rate">Velocidad de voz</string>
+    <string name="settings_speech_rate_desc">Velocidad de reproducción de descriptores de audio</string>
+    <string name="settings_speech_rate_value">1.0x</string>
+    <string name="settings_speech_rate_min">0.5x</string>
+    <string name="settings_speech_rate_max">2.5x</string>
+    <string name="settings_section_detection">DETECCIÓN</string>
+    <string name="settings_cooldown">Intervalo de enfriamiento</string>
+    <string name="settings_cooldown_value">2.0s</string>
+    <string name="settings_cooldown_desc">Tiempo mínimo entre anuncios del mismo objeto</string>
+    <string name="settings_cooldown_min">0.5s</string>
+    <string name="settings_cooldown_max">5.0s</string>
+    <string name="settings_confidence">Umbral de confianza</string>
+    <string name="settings_confidence_value">0.30</string>
+    <string name="settings_confidence_desc">Puntuación mínima de confianza para anunciar una detección</string>
+    <string name="settings_confidence_min">0.10</string>
+    <string name="settings_confidence_max">0.90</string>
+    <string name="settings_max_objects">Máximo de objetos por ciclo</string>
+    <string name="settings_max_objects_desc">Número máximo de objetos anunciados simultáneamente</string>
+    <string name="settings_max_objects_1">1</string>
+    <string name="settings_max_objects_2">2</string>
+    <string name="settings_max_objects_3">3</string>
+    <string name="settings_section_behaviour">COMPORTAMIENTO</string>
+    <string name="settings_auto_mode">Iniciar en modo automático</string>
+    <string name="settings_auto_mode_desc">Modo de detección predeterminado al abrir la app</string>
+    <string name="settings_show_preview">Mostrar vista previa de cámara</string>
+    <string name="settings_show_preview_desc">Mostrar feed de cámara en vivo en pantalla</string>
+    <string name="settings_speech_rate_display">%1$.1fx</string>
+    <string name="settings_cooldown_display">%1$.1fs</string>
+    <string name="settings_confidence_display">%1$.2f</string>
 </resources>
