@@ -1,29 +1,457 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="16dp">
+    android:background="#111111">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/settings_title"
-        android:textSize="24sp"
-        android:textStyle="bold"
-        android:layout_marginBottom="24dp"/>
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/settings_language"
-        android:textSize="16sp"
-        android:layout_marginBottom="8dp"/>
-
-    <Spinner
-        android:id="@+id/languageSpinner"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="48dp"
-        android:layout_marginBottom="24dp"/>
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="20dp">
 
-</LinearLayout>
+        <!-- Header -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="28dp">
+
+            <ImageButton
+                android:id="@+id/btnBack"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@drawable/icon_button_bg"
+                android:src="@drawable/ic_back"
+                android:contentDescription="@string/settings_back"
+                android:layout_marginEnd="12dp" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/settings_title"
+                android:textColor="#FFFFFF"
+                android:textSize="22sp"
+                android:textStyle="bold" />
+
+        </LinearLayout>
+
+        <!-- ── AUDIO ── -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/settings_section_audio"
+            android:textColor="#1D9E75"
+            android:textSize="11sp"
+            android:textStyle="bold"
+            android:letterSpacing="0.12"
+            android:layout_marginBottom="12dp" />
+
+        <!-- Language -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@drawable/settings_card_bg"
+            android:padding="16dp"
+            android:layout_marginBottom="8dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/settings_language"
+                android:textColor="#FFFFFF"
+                android:textSize="15sp"
+                android:layout_marginBottom="4dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/settings_language_desc"
+                android:textColor="#99FFFFFF"
+                android:textSize="12sp"
+                android:layout_marginBottom="12dp" />
+
+            <Spinner
+                android:id="@+id/languageSpinner"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:background="@drawable/spinner_bg"
+                android:paddingHorizontal="12dp" />
+
+        </LinearLayout>
+
+        <!-- Speech rate -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@drawable/settings_card_bg"
+            android:padding="16dp"
+            android:layout_marginBottom="8dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/settings_speech_rate"
+                    android:textColor="#FFFFFF"
+                    android:textSize="15sp" />
+
+                <TextView
+                    android:id="@+id/speechRateValue"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/settings_speech_rate_value"
+                    android:textColor="#1D9E75"
+                    android:textSize="13sp" />
+
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/settings_speech_rate_desc"
+                android:textColor="#99FFFFFF"
+                android:textSize="12sp"
+                android:layout_marginBottom="8dp" />
+
+            <SeekBar
+                android:id="@+id/speechRateSeekBar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:max="20"
+                android:progress="10"
+                android:progressTint="#1D9E75"
+                android:thumbTint="#1D9E75" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+                <TextView android:layout_width="0dp" android:layout_height="wrap_content"
+                    android:layout_weight="1"                     android:text="@string/settings_speech_rate_min"
+                    android:textColor="#80FFFFFF" android:textSize="11sp" />
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="@string/settings_speech_rate_max" android:textColor="#80FFFFFF" android:textSize="11sp" />
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <!-- ── DETECTION ── -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/settings_section_detection"
+            android:textColor="#1D9E75"
+            android:textSize="11sp"
+            android:textStyle="bold"
+            android:letterSpacing="0.12"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="12dp" />
+
+        <!-- Cooldown -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@drawable/settings_card_bg"
+            android:padding="16dp"
+            android:layout_marginBottom="8dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/settings_cooldown"
+                    android:textColor="#FFFFFF"
+                    android:textSize="15sp" />
+
+                <TextView
+                    android:id="@+id/cooldownValue"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/settings_cooldown_value"
+                    android:textColor="#1D9E75"
+                    android:textSize="13sp" />
+
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/settings_cooldown_desc"
+                android:textColor="#99FFFFFF"
+                android:textSize="12sp"
+                android:layout_marginBottom="8dp" />
+
+            <SeekBar
+                android:id="@+id/cooldownSeekBar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:max="45"
+                android:progress="15"
+                android:progressTint="#1D9E75"
+                android:thumbTint="#1D9E75" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+                <TextView android:layout_width="0dp" android:layout_height="wrap_content"
+                    android:layout_weight="1"                     android:text="@string/settings_cooldown_min"
+                    android:textColor="#80FFFFFF" android:textSize="11sp" />
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="@string/settings_cooldown_max" android:textColor="#80FFFFFF" android:textSize="11sp" />
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <!-- Confidence threshold -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@drawable/settings_card_bg"
+            android:padding="16dp"
+            android:layout_marginBottom="8dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/settings_confidence"
+                    android:textColor="#FFFFFF"
+                    android:textSize="15sp" />
+
+                <TextView
+                    android:id="@+id/confidenceValue"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/settings_confidence_value"
+                    android:textColor="#1D9E75"
+                    android:textSize="13sp" />
+
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/settings_confidence_desc"
+                android:textColor="#99FFFFFF"
+                android:textSize="12sp"
+                android:layout_marginBottom="8dp" />
+
+            <SeekBar
+                android:id="@+id/confidenceSeekBar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:max="80"
+                android:progress="20"
+                android:progressTint="#1D9E75"
+                android:thumbTint="#1D9E75" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+                <TextView android:layout_width="0dp" android:layout_height="wrap_content"
+                    android:layout_weight="1"                     android:text="@string/settings_confidence_min"
+                    android:textColor="#80FFFFFF" android:textSize="11sp" />
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="@string/settings_confidence_max" android:textColor="#80FFFFFF" android:textSize="11sp" />
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <!-- Max objects -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@drawable/settings_card_bg"
+            android:padding="16dp"
+            android:layout_marginBottom="8dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/settings_max_objects"
+                android:textColor="#FFFFFF"
+                android:textSize="15sp"
+                android:layout_marginBottom="4dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/settings_max_objects_desc"
+                android:textColor="#99FFFFFF"
+                android:textSize="12sp"
+                android:layout_marginBottom="12dp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:weightSum="3"
+                android:id="@+id/maxObjectsGroup">
+
+                <Button
+                    android:id="@+id/btnMax1"
+                    android:layout_width="0dp"
+                    android:layout_height="40dp"
+                    android:layout_weight="1"
+                    android:text="@string/settings_max_objects_1"
+                    android:layout_marginEnd="6dp"
+                    android:background="@drawable/toggle_bg"
+                    android:textColor="#99FFFFFF"
+                    android:textSize="14sp"
+                    style="?android:attr/buttonBarButtonStyle" />
+
+                <Button
+                    android:id="@+id/btnMax2"
+                    android:layout_width="0dp"
+                    android:layout_height="40dp"
+                    android:layout_weight="1"
+                    android:text="@string/settings_max_objects_2"
+                    android:layout_marginHorizontal="3dp"
+                    android:background="@drawable/toggle_selected_bg"
+                    android:textColor="#FFFFFF"
+                    android:textSize="14sp"
+                    style="?android:attr/buttonBarButtonStyle" />
+
+                <Button
+                    android:id="@+id/btnMax3"
+                    android:layout_width="0dp"
+                    android:layout_height="40dp"
+                    android:layout_weight="1"
+                    android:text="@string/settings_max_objects_3"
+                    android:layout_marginStart="6dp"
+                    android:background="@drawable/toggle_bg"
+                    android:textColor="#99FFFFFF"
+                    android:textSize="14sp"
+                    style="?android:attr/buttonBarButtonStyle" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <!-- ── BEHAVIOUR ── -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/settings_section_behaviour"
+            android:textColor="#1D9E75"
+            android:textSize="11sp"
+            android:textStyle="bold"
+            android:letterSpacing="0.12"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="12dp" />
+
+        <!-- Default mode -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:background="@drawable/settings_card_bg"
+            android:padding="16dp"
+            android:layout_marginBottom="8dp">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/settings_auto_mode"
+                    android:textColor="#FFFFFF"
+                    android:textSize="15sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/settings_auto_mode_desc"
+                    android:textColor="#99FFFFFF"
+                    android:textSize="12sp" />
+
+            </LinearLayout>
+
+            <com.google.android.material.switchmaterial.SwitchMaterial
+                android:id="@+id/switchAutoMode"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checked="true"
+                android:thumbTint="#1D9E75"
+                android:trackTint="#1D9E75" />
+
+        </LinearLayout>
+
+        <!-- Show preview -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:background="@drawable/settings_card_bg"
+            android:padding="16dp"
+            android:layout_marginBottom="28dp">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/settings_show_preview"
+                    android:textColor="#FFFFFF"
+                    android:textSize="15sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/settings_show_preview_desc"
+                    android:textColor="#99FFFFFF"
+                    android:textSize="12sp" />
+
+            </LinearLayout>
+
+            <com.google.android.material.switchmaterial.SwitchMaterial
+                android:id="@+id/switchShowPreview"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checked="true"
+                android:thumbTint="#1D9E75"
+                android:trackTint="#1D9E75" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+</ScrollView>
