@@ -62,7 +62,14 @@ class SettingsFragment : Fragment() {
 
         binding.languageSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>, view: View?, pos: Int, id: Long) {
-                if (!isInitializing) viewModel.setLanguage(languages[pos].second)
+                if (!isInitializing) {
+                    viewModel.setLanguage(languages[pos].second)
+                    androidx.appcompat.app.AppCompatDelegate.setApplicationLocales(
+                        androidx.core.os.LocaleListCompat.create(
+                            java.util.Locale.forLanguageTag(languages[pos].second)
+                        )
+                    )
+                }
             }
             override fun onNothingSelected(parent: AdapterView<*>) {}
         }

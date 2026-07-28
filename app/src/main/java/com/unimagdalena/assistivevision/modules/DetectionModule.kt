@@ -16,10 +16,8 @@ class DetectionModule(context: Context) {
     private val maxModelDetections: Int
 
     companion object {
-        const val CONFIDENCE_THRESHOLD = 0.30f // tune as needed
-        const val MAX_DETECTIONS = 15          // tune as needed
+        const val MAX_DETECTIONS = 15
         const val INPUT_SIZE = 448
-        // COCO class ID → label name (model outputs 0-indexed, add 1 for COCO ID)
         val TARGET_LABELS = mapOf(
             1 to "person",
             62 to "chair",
@@ -40,7 +38,7 @@ class DetectionModule(context: Context) {
         maxModelDetections = interpreter.getOutputTensor(0).shape()[1]
     }
 
-    fun detect(inputBuffer: ByteBuffer): List<Detection> {
+    fun detect(inputBuffer: ByteBuffer, confidenceThreshold: Float): List<Detection> {
         val boxes = Array(1) { Array(maxModelDetections) { FloatArray(4) } }
         val classes = Array(1) { FloatArray(maxModelDetections) }
         val scores = Array(1) { FloatArray(maxModelDetections) }
@@ -57,7 +55,7 @@ class DetectionModule(context: Context) {
 
         return (0 until numDetections)
             .asSequence()
-            .filter { scores[0][it] >= CONFIDENCE_THRESHOLD }
+            .filter { scores[0][it] >= confidenceThreshold }
             .filter { TARGET_LABELS.containsKey(classes[0][it].toInt() + 1) }
             .map { i ->
                 val classId = classes[0][i].toInt() + 1

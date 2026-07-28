@@ -35,11 +35,10 @@ class CameraFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        viewModel.initialize(requireContext())
         setupCamera()
         setupListeners()
         observeViewModel()
-        setMode(true)
+        observeSettings()
     }
 
     private fun setupCamera() {
@@ -125,6 +124,15 @@ class CameraFragment : Fragment() {
         }
         viewModel.fps.observe(viewLifecycleOwner) { fps ->
             if (!isPaused) binding.statusText.text = getString(R.string.status_fps, fps)
+        }
+    }
+
+    private fun observeSettings() {
+        viewModel.showPreview.observe(viewLifecycleOwner) { show ->
+            binding.previewView.visibility = if (show) View.VISIBLE else View.INVISIBLE
+        }
+        viewModel.defaultAutoMode.observe(viewLifecycleOwner) { auto ->
+            setMode(automatic = auto)
         }
     }
 
