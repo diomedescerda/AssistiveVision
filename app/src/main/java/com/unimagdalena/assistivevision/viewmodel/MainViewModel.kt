@@ -10,9 +10,13 @@ import androidx.lifecycle.viewModelScope
 import com.unimagdalena.assistivevision.R
 import com.unimagdalena.assistivevision.data.SettingsManager
 import com.unimagdalena.assistivevision.model.Detection
+import com.unimagdalena.assistivevision.model.LocalizedLabels
+import com.unimagdalena.assistivevision.model.SpeechFormatter
+import com.unimagdalena.assistivevision.modules.AudioModule
 import com.unimagdalena.assistivevision.modules.DetectionModule
 import com.unimagdalena.assistivevision.modules.LocalizationModule
 import com.unimagdalena.assistivevision.modules.PreprocessingModule
+import com.unimagdalena.assistivevision.modules.PriorityFilterModule
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -27,10 +31,13 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private lateinit var preprocessingModule: PreprocessingModule
     private lateinit var detectionModule: DetectionModule
     private val localizationModule = LocalizationModule()
+    private val priorityFilter = PriorityFilterModule()
+    private lateinit var audioModule: AudioModule
     private lateinit var appContext: Context
 
     private var isAutomatic = true
     private var lastBitmap: Bitmap? = null
+    private var cooldownMs: Long = 2_000L
 
     private val _detectionCount = MutableLiveData(0)
     val detectionCount: LiveData<Int> = _detectionCount
@@ -60,6 +67,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         appContext = application
         preprocessingModule = PreprocessingModule()
         detectionModule = DetectionModule(application)
+        audioModule = AudioModule(application)
 
         viewModelScope.launch {
             settings.confidence.collect { _confidence.value = it }
@@ -74,7 +82,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             settings.defaultAutoMode.collect { _defaultAutoMode.postValue(it) }
         }
         viewModelScope.launch {
-            settings.language.collect { /* locale applied on user action in SettingsFragment */ }
+            settings.language.collect { audioModule.setLanguage(it) }
         }
         // TODO: Language change causes a black flash during activity recreation.
         // Options to fix:
@@ -84,16 +92,18 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         //     so the flash blends in instead of showing black
         //  3. Apply locale only on next cold start (remove setApplicationLocales
         //     from SettingsFragment, keep only in MainActivity.applySavedLocale)
+        // Option 1 is applied in the manifest; see MainActivity.onConfigurationChanged().
         viewModelScope.launch {
-            settings.speechRate.collect { /* consumed by AudioModule when implemented */ }
+            settings.speechRate.collect { audioModule.setSpeechRate(it) }
         }
         viewModelScope.launch {
-            settings.cooldown.collect { /* consumed by PriorityFilterModule when implemented */ }
+            settings.cooldown.collect { cooldownMs = (it * 1000).toLong() }
         }
     }
 
     fun setAutomatic(automatic: Boolean) {
         isAutomatic = automatic
+        priorityFilter.reset()
     }
 
     fun processFrame(bitmap: Bitmap) {
@@ -102,10 +112,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun speakNow() {
-        lastBitmap?.let { runPipeline(it) }
+        lastBitmap?.let { runPipeline(it, force = true) }
     }
 
-    private fun runPipeline(bitmap: Bitmap) {
+    private fun runPipeline(bitmap: Bitmap, force: Boolean = false) {
         val confidence = _confidence.value
         val maxObjects = _maxObjects.value
 
@@ -133,6 +143,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 if (localized.isNotEmpty()) {
                     val top = localized.first()
                     _zoneLabel.postValue("${top.className} · ${top.zone}")
+
+                    if (force || priorityFilter.shouldAnnounce(localized, cooldownMs)) {
+                        audioModule.speak(buildUtterance(localized))
+                    }
                 } else {
                     _zoneLabel.postValue(appContext.getString(R.string.no_detections))
                 }
@@ -142,8 +156,17 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    private fun buildUtterance(localized: List<Detection>): String {
+        val spoken = localized.map { detection ->
+            LocalizedLabels.classLabel(appContext, detection.classId) to
+                LocalizedLabels.zoneLabel(appContext, detection.zone)
+        }
+        return SpeechFormatter.announce(spoken)
+    }
+
     override fun onCleared() {
         super.onCleared()
+        audioModule.shutdown()
         detectionModule.close()
     }
 }

@@ -61,6 +61,13 @@ class MainActivity : AppCompatActivity() {
             this, Manifest.permission.CAMERA
         ) == PackageManager.PERMISSION_GRANTED
 
+    override fun onConfigurationChanged(newConfig: android.content.res.Configuration) {
+        super.onConfigurationChanged(newConfig)
+        // The activity is not recreated on locale/layoutDirection changes
+        // (see android:configChanges), so no black flash occurs. The ViewModel
+        // already observes the language setting and re-applies it to the TTS engine.
+    }
+
     private fun applySavedLocale() {
         val lang = runBlocking(Dispatchers.IO) {
             SettingsManager(this@MainActivity).language.first()
