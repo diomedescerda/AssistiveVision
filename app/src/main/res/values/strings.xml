@@ -1,6 +1,18 @@
 <resources>
     <string name="app_name">AssistiveVision</string>
 
+    <!-- Object class names (English, used for spoken output) -->
+    <string name="class_person">person</string>
+    <string name="class_chair">chair</string>
+    <string name="class_couch">couch</string>
+    <string name="class_bed">bed</string>
+    <string name="class_table">table</string>
+    <string name="class_toilet">toilet</string>
+    <string name="class_tv">television</string>
+    <string name="class_computer">computer</string>
+    <string name="class_sink">sink</string>
+    <string name="class_refrigerator">refrigerator</string>
+
     <!-- Zone labels (English) -->
     <string name="zone_left_top">upper left</string>
     <string name="zone_left_bottom">lower left</string>
