@@ -14,6 +14,8 @@ AssistiveVision leverages on-device machine learning to help visually impaired i
 - **Detection overlay** with teal-colored bounding boxes and label tags
 - **AUTO / MANUAL modes** — continuous detection or on-demand capture
 - **Spatial localization** — zones like "center bottom", "left top" etc.
+- **Spoken announcements** — Android text-to-speech reports detected objects with
+  localized names and zones (e.g. "silla, frente a ti"), throttled by a cooldown.
 - **Multi-language support** — English and Spanish via Android string resources
 - **Immersive full-screen** — system bars hidden, edge-to-edge layout
 - **Pipeline mutex** — skips frames if the pipeline is busy, matching CameraX KEEP_ONLY_LATEST strategy
@@ -35,6 +37,8 @@ CameraX Capture → Preprocessing → TFLite Detection → Localization → Over
 | `PreprocessingModule` | Letterbox resize to 448x448 with RGB tensor conversion and bitmap recycling |
 | `DetectionModule` | TFLite EfficientDet-Lite2 inference with COCO class mapping and confidence filtering |
 | `LocalizationModule` | Spatial zone computation (left/center/right × top/bottom) |
+| `PriorityFilterModule` | Cooldown-based suppression of repeated announcements of the same top object |
+| `AudioModule` | Android TextToSpeech wrapper (ready gating, language/speech-rate, QUEUE_FLUSH) |
 
 ### UI
 
@@ -51,8 +55,13 @@ CameraX Capture → Preprocessing → TFLite Detection → Localization → Over
 2. **PreprocessingModule** converts frames to 448x448 uint8 tensors with letterbox padding (recycles intermediate bitmaps)
 3. **DetectionModule** runs EfficientDet-Lite2 inference, filters to target COCO classes
 4. **LocalizationModule** assigns spatial zones to each detection
-5. **MainViewModel** exposes detections, zone labels, FPS, and detection count via LiveData
-6. **CameraFragment** observes LiveData and updates the OverlayView and status UI
+5. **PriorityFilterModule** gates whether the top detection should be announced (cooldown, immediate on manual capture)
+6. **AudioModule** speaks a localized announcement ("silla, frente a ti") built by `SpeechFormatter`
+7. **MainViewModel** exposes detections, zone labels, FPS, and detection count via LiveData
+8. **CameraFragment** observes LiveData and updates the OverlayView and status UI
+
+Spoken object names and zone labels are resolved through localized string resources
+(`LocalizedLabels`), keeping the sentence assembly in `SpeechFormatter` pure and unit-testable.
 
 ## Tech Stack
 
@@ -88,12 +97,14 @@ app/src/main/java/com/unimagdalena/assistivevision/
 │   ├── PreprocessingModule.kt    # Image preprocessing, tensor conversion, bitmap recycling
 │   ├── DetectionModule.kt        # TFLite inference, COCO class mapping, confidence filtering
 │   ├── LocalizationModule.kt     # Spatial zone computation
-│   ├── AudioModule.kt            # (placeholder) Text-to-speech output
-│   └── PriorityFilterModule.kt   # (placeholder) Detection prioritization
+│   ├── PriorityFilterModule.kt   # Cooldown-based announcement throttling
+│   └── AudioModule.kt            # Text-to-speech wrapper (language, rate, QUEUE_FLUSH)
 ├── viewmodel/
 │   └── MainViewModel.kt          # Pipeline orchestration, LiveData, mutex concurrency
 ├── model/
-│   └── Detection.kt              # Detection data class (classId, className, score, bbox, zone)
+│   ├── Detection.kt              # Detection data class (classId, className, score, bbox, zone)
+│   ├── SpeechFormatter.kt        # Pure, testable announcement sentence assembly
+│   └── LocalizedLabels.kt        # Class-name and zone labels from string resources
 └── ui/
     ├── MainActivity.kt           # Immersive edge-to-edge host, permission handling
     ├── CameraFragment.kt         # Camera preview, overlay, mode toggle, status UI
@@ -125,9 +136,15 @@ app/src/main/java/com/unimagdalena/assistivevision/
 ### Usage
 
 1. Grant camera permission when prompted
-2. The app starts in AUTO mode — point the camera at objects and detection boxes appear in real time
-3. Switch to MANUAL mode to capture frames on demand using the Speak button
-4. Access Settings to change the language
+2. The app starts in AUTO mode — point the camera at objects and detection boxes appear in real time; the top object is announced by voice (gated by the cooldown)
+3. Switch to MANUAL mode to capture frames on demand using the Speak button (announces immediately)
+4. Access Settings to change the language, speech rate, cooldown, or confidence
+
+## Tests
+
+- `./gradlew test` runs local unit tests for `PriorityFilterModule` (cooldown
+  suppression) and `SpeechFormatter` (announcement assembly), plus instrumented
+  tests on device.
 
 ## Configuration
 
