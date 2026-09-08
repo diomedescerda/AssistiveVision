@@ -20,8 +20,6 @@ class CameraFragment : Fragment() {
     private lateinit var captureModule: CaptureModule
 
     private var isFullscreen = false
-    private var isPaused = false
-    private var isAutomatic = true
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -43,7 +41,7 @@ class CameraFragment : Fragment() {
 
     private fun setupCamera() {
         captureModule = CaptureModule(requireContext(), viewLifecycleOwner) { bitmap ->
-            if (!isPaused) viewModel.processFrame(bitmap)
+            viewModel.processFrame(bitmap)
         }
         captureModule.start(binding.previewView)
     }
@@ -62,54 +60,15 @@ class CameraFragment : Fragment() {
             )
         }
 
-        // Mode toggle
-        binding.btnAutomatic.setOnClickListener { setMode(automatic = true) }
-        binding.btnManual.setOnClickListener { setMode(automatic = false) }
-
-        // Pause / Resume
-        binding.btnPause.setOnClickListener {
-            isPaused = !isPaused
-            binding.pauseIcon.setImageResource(
-                if (isPaused) R.drawable.ic_play else R.drawable.ic_pause
-            )
-            binding.pauseLabel.text = if (isPaused) getString(R.string.action_resume) else getString(R.string.action_pause)
-            binding.statusText.text = if (isPaused) getString(R.string.status_text_paused) else getString(R.string.status_text_detecting)
-            binding.statusDot.setBackgroundResource(
-                if (isPaused) R.drawable.status_dot_inactive
-                else R.drawable.status_dot_active
-            )
-        }
-
-        // Speak (manual mode only)
-        binding.btnSpeak.setOnClickListener {
-            if (!isAutomatic) viewModel.speakNow()
+        // Take photo (runs detection on the latest frame)
+        binding.btnCapture.setOnClickListener {
+            viewModel.captureFrame()
         }
 
         // Settings
         binding.btnSettings.setOnClickListener {
             findNavController().navigate(R.id.action_camera_to_settings)
         }
-    }
-
-    private fun setMode(automatic: Boolean) {
-        isAutomatic = automatic
-        binding.btnAutomatic.apply {
-            setBackgroundResource(if (automatic) R.drawable.toggle_selected_bg else android.R.color.transparent)
-            backgroundTintList = null
-        }
-        binding.btnManual.apply {
-            setBackgroundResource(if (!automatic) R.drawable.toggle_selected_bg else android.R.color.transparent)
-            backgroundTintList = null
-        }
-        binding.btnAutomatic.setTextColor(
-            if (automatic) 0xFFFFFFFF.toInt() else 0x66FFFFFF.toInt()
-        )
-        binding.btnManual.setTextColor(
-            if (!automatic) 0xFFFFFFFF.toInt() else 0x66FFFFFF.toInt()
-        )
-        binding.btnSpeak.alpha = if (automatic) 0.4f else 1.0f
-        binding.btnSpeak.isClickable = !automatic
-        viewModel.setAutomatic(automatic)
     }
 
     private fun observeViewModel() {
@@ -119,20 +78,28 @@ class CameraFragment : Fragment() {
         viewModel.detections.observe(viewLifecycleOwner) { detections ->
             binding.overlayView.setDetections(detections)
         }
+        viewModel.frameSize.observe(viewLifecycleOwner) { (width, height) ->
+            binding.overlayView.setFrameSize(width, height)
+        }
         viewModel.zoneLabel.observe(viewLifecycleOwner) { label ->
             binding.zoneLabel.text = label
         }
-        viewModel.fps.observe(viewLifecycleOwner) { fps ->
-            if (!isPaused) binding.statusText.text = getString(R.string.status_fps, fps)
+        viewModel.frozenFrame.observe(viewLifecycleOwner) { frozen ->
+            binding.statusText.text = if (frozen != null) getString(R.string.status_text_detecting)
+            else getString(R.string.status_ready)
+            if (frozen != null) {
+                binding.capturedImage.setImageBitmap(frozen)
+                binding.capturedImage.visibility = View.VISIBLE
+            } else {
+                binding.capturedImage.setImageDrawable(null)
+                binding.capturedImage.visibility = View.GONE
+            }
         }
     }
 
     private fun observeSettings() {
         viewModel.showPreview.observe(viewLifecycleOwner) { show ->
             binding.previewView.visibility = if (show) View.VISIBLE else View.INVISIBLE
-        }
-        viewModel.defaultAutoMode.observe(viewLifecycleOwner) { auto ->
-            setMode(automatic = auto)
         }
     }
 

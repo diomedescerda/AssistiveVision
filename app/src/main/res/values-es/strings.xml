@@ -14,30 +14,22 @@
     <string name="class_refrigerator">refrigerador</string>
 
     <!-- Zone labels (Spanish) -->
-    <string name="zone_left_top">arriba a la izquierda</string>
-    <string name="zone_left_bottom">abajo a la izquierda</string>
-    <string name="zone_center_top">arriba al centro</string>
-    <string name="zone_center_bottom">frente a ti</string>
-    <string name="zone_right_top">arriba a la derecha</string>
-    <string name="zone_right_bottom">abajo a la derecha</string>
+    <string name="zone_left_top">arriba a la izquierda de donde estás apuntando</string>
+    <string name="zone_left_bottom">abajo a la izquierda de donde estás apuntando</string>
+    <string name="zone_center_top">arriba de donde estás apuntando</string>
+    <string name="zone_center_bottom">donde estás apuntando</string>
+    <string name="zone_right_top">arriba a la derecha de donde estás apuntando</string>
+    <string name="zone_right_bottom">abajo a la derecha de donde estás apuntando</string>
 
     <!-- UI labels (Spanish) -->
-    <string name="toggle_detection_mode">Cambiar modo de detección</string>
     <string name="capture_frame">Capturar fotograma</string>
-    <string name="detecting">detectando…</string>
     <string name="no_detections">sin detecciones</string>
     <string name="toggle_fullscreen">Alternar pantalla completa</string>
     <string name="app_icon">Icono de la aplicación</string>
     <string name="status_active">● activo</string>
-    <string name="mode_automatic">Automático</string>
-    <string name="mode_manual">Manual</string>
+    <string name="status_ready">listo</string>
     <string name="status_text_detecting">detectando</string>
-    <string name="status_text_paused">pausado</string>
     <string name="objects_count">%d objetos</string>
-    <string name="status_fps">detectando · %.1f fps</string>
-    <string name="action_speak">Hablar</string>
-    <string name="action_pause">Pausar</string>
-    <string name="action_resume">Reanudar</string>
     <string name="action_settings">Configuración</string>
 
     <!-- Settings (Spanish) -->
@@ -52,11 +44,6 @@
     <string name="settings_speech_rate_min">0.5x</string>
     <string name="settings_speech_rate_max">2.5x</string>
     <string name="settings_section_detection">DETECCIÓN</string>
-    <string name="settings_cooldown">Intervalo de enfriamiento</string>
-    <string name="settings_cooldown_value">2.0s</string>
-    <string name="settings_cooldown_desc">Tiempo mínimo entre anuncios del mismo objeto</string>
-    <string name="settings_cooldown_min">0.5s</string>
-    <string name="settings_cooldown_max">5.0s</string>
     <string name="settings_confidence">Umbral de confianza</string>
     <string name="settings_confidence_value">0.30</string>
     <string name="settings_confidence_desc">Puntuación mínima de confianza para anunciar una detección</string>
@@ -68,11 +55,8 @@
     <string name="settings_max_objects_2">2</string>
     <string name="settings_max_objects_3">3</string>
     <string name="settings_section_behaviour">COMPORTAMIENTO</string>
-    <string name="settings_auto_mode">Iniciar en modo automático</string>
-    <string name="settings_auto_mode_desc">Modo de detección predeterminado al abrir la app</string>
     <string name="settings_show_preview">Mostrar vista previa de cámara</string>
     <string name="settings_show_preview_desc">Mostrar feed de cámara en vivo en pantalla</string>
     <string name="settings_speech_rate_display">%1$.1fx</string>
-    <string name="settings_cooldown_display">%1$.1fs</string>
     <string name="settings_confidence_display">%1$.2f</string>
 </resources>

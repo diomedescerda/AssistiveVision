@@ -13,6 +13,19 @@
         android:id="@+id/previewView"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        app:scaleType="fitCenter"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- Frozen capture frame (shown while announcing) -->
+    <ImageView
+        android:id="@+id/capturedImage"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:visibility="gone"
+        android:scaleType="fitCenter"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -51,7 +64,7 @@
         android:textSize="12sp"
         android:paddingHorizontal="14dp"
         android:paddingVertical="4dp"
-        android:text="@string/detecting"
+        android:text="@string/status_ready"
         android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="@id/previewView"
         app:layout_constraintStart_toStartOf="parent"
@@ -120,44 +133,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
-        <!-- Mode toggle -->
-        <LinearLayout
-            android:id="@+id/modeToggle"
-            android:layout_width="match_parent"
-            android:layout_height="56dp"
-            android:orientation="horizontal"
-            android:baselineAligned="false"
-            android:background="@drawable/toggle_bg"
-            android:padding="4dp">
-
-            <Button
-                android:id="@+id/btnAutomatic"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:text="@string/mode_automatic"
-                android:textSize="13sp"
-                android:background="@drawable/toggle_selected_bg"
-                android:textColor="#FFFFFF"
-                android:stateListAnimator="@null"
-                app:backgroundTint="@null" />
-
-            <Button
-                android:id="@+id/btnManual"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:text="@string/mode_manual"
-                android:textSize="13sp"
-                android:background="@android:color/transparent"
-                android:textColor="#66FFFFFF"
-                android:stateListAnimator="@null"
-                app:backgroundTint="@null" />
-
-        </LinearLayout>
-
-        <Space android:layout_width="match_parent" android:layout_height="12dp" />
-
         <!-- Status row -->
         <LinearLayout
             android:layout_width="match_parent"
@@ -178,7 +153,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="@string/status_fps"
+                android:text="@string/status_ready"
                 android:textColor="#80FFFFFF"
                 android:textSize="12sp"
                 android:layout_marginStart="8dp" />
@@ -205,34 +180,7 @@
             android:weightSum="3">
 
             <LinearLayout
-                android:id="@+id/btnSpeak"
-                android:layout_width="0dp"
-                android:layout_height="64dp"
-                android:layout_weight="1"
-                android:orientation="vertical"
-                android:gravity="center"
-                android:background="@drawable/action_button_bg"
-                android:layout_marginEnd="4dp"
-                android:alpha="0.4">
-
-                <ImageView
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
-                    android:src="@drawable/ic_volume"
-                    android:contentDescription="@string/action_speak" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/action_speak"
-                    android:textColor="#B3FFFFFF"
-                    android:textSize="11sp"
-                    android:layout_marginTop="4dp" />
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/btnPause"
+                android:id="@+id/btnCapture"
                 android:layout_width="0dp"
                 android:layout_height="64dp"
                 android:layout_weight="1"
@@ -242,17 +190,15 @@
                 android:layout_marginHorizontal="4dp">
 
                 <ImageView
-                    android:id="@+id/pauseIcon"
                     android:layout_width="20dp"
                     android:layout_height="20dp"
-                    android:src="@drawable/ic_pause"
-                    android:contentDescription="@string/action_pause" />
+                    android:src="@drawable/ic_camera"
+                    android:contentDescription="@string/capture_frame" />
 
                 <TextView
-                    android:id="@+id/pauseLabel"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/action_pause"
+                    android:text="@string/capture_frame"
                     android:textColor="#B3FFFFFF"
                     android:textSize="11sp"
                     android:layout_marginTop="4dp" />

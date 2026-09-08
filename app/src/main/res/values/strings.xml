@@ -14,30 +14,22 @@
     <string name="class_refrigerator">refrigerator</string>
 
     <!-- Zone labels (English) -->
-    <string name="zone_left_top">upper left</string>
-    <string name="zone_left_bottom">lower left</string>
-    <string name="zone_center_top">centered above</string>
-    <string name="zone_center_bottom">in front of you</string>
-    <string name="zone_right_top">upper right</string>
-    <string name="zone_right_bottom">lower right</string>
+    <string name="zone_left_top">to the upper left of where you\'re pointing</string>
+    <string name="zone_left_bottom">to the lower left of where you\'re pointing</string>
+    <string name="zone_center_top">above where you\'re pointing</string>
+    <string name="zone_center_bottom">where you\'re pointing</string>
+    <string name="zone_right_top">to the upper right of where you\'re pointing</string>
+    <string name="zone_right_bottom">to the lower right of where you\'re pointing</string>
 
     <!-- UI labels (English) -->
-    <string name="toggle_detection_mode">Toggle detection mode</string>
     <string name="capture_frame">Capture frame</string>
-    <string name="detecting">detecting…</string>
     <string name="no_detections">no detections</string>
     <string name="toggle_fullscreen">Toggle fullscreen</string>
     <string name="app_icon">App icon</string>
     <string name="status_active">● active</string>
-    <string name="mode_automatic">Automatic</string>
-    <string name="mode_manual">Manual</string>
+    <string name="status_ready">ready</string>
     <string name="status_text_detecting">detecting</string>
-    <string name="status_text_paused">paused</string>
     <string name="objects_count">%d objects</string>
-    <string name="status_fps">detecting · %.1f fps</string>
-    <string name="action_speak">Speak</string>
-    <string name="action_pause">Pause</string>
-    <string name="action_resume">Resume</string>
     <string name="action_settings">Settings</string>
 
     <!-- Settings (English) -->
@@ -52,11 +44,6 @@
     <string name="settings_speech_rate_min">0.5x</string>
     <string name="settings_speech_rate_max">2.5x</string>
     <string name="settings_section_detection">DETECTION</string>
-    <string name="settings_cooldown">Cooldown interval</string>
-    <string name="settings_cooldown_value">2.0s</string>
-    <string name="settings_cooldown_desc">Minimum time between announcements of the same object</string>
-    <string name="settings_cooldown_min">0.5s</string>
-    <string name="settings_cooldown_max">5.0s</string>
     <string name="settings_confidence">Confidence threshold</string>
     <string name="settings_confidence_value">0.30</string>
     <string name="settings_confidence_desc">Minimum confidence score to announce a detection</string>
@@ -68,11 +55,8 @@
     <string name="settings_max_objects_2">2</string>
     <string name="settings_max_objects_3">3</string>
     <string name="settings_section_behaviour">BEHAVIOUR</string>
-    <string name="settings_auto_mode">Start in automatic mode</string>
-    <string name="settings_auto_mode_desc">Default detection mode when app opens</string>
     <string name="settings_show_preview">Show camera preview</string>
     <string name="settings_show_preview_desc">Display live camera feed on screen</string>
     <string name="settings_speech_rate_display">%1$.1fx</string>
-    <string name="settings_cooldown_display">%1$.1fs</string>
     <string name="settings_confidence_display">%1$.2f</string>
 </resources>

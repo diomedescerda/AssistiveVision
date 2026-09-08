@@ -2,6 +2,7 @@ package com.unimagdalena.assistivevision.modules
 
 import android.content.Context
 import android.graphics.Bitmap
+import android.graphics.Matrix
 import android.util.Log
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageAnalysis
@@ -52,7 +53,8 @@ class CaptureModule (
                     lastFrameTime = now
                     Log.d("CaptureModule", "Frame received: ${imageProxy.width}x${imageProxy.height}")
                     val bitmap = imageProxy.toBitmap()
-                    onFrameReady(bitmap)
+                    val rotated = rotateBitmap(bitmap, imageProxy.imageInfo.rotationDegrees)
+                    onFrameReady(rotated)
                 }
                 imageProxy.close()
             }
@@ -65,6 +67,14 @@ class CaptureModule (
                 imageAnalysis
             )
         }, ContextCompat.getMainExecutor(context))
+    }
+
+    private fun rotateBitmap(bitmap: Bitmap, degrees: Int): Bitmap {
+        if (degrees == 0) return bitmap
+        val matrix = Matrix().apply { postRotate(degrees.toFloat()) }
+        val rotated = Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true)
+        if (rotated != bitmap) bitmap.recycle()
+        return rotated
     }
 
     fun shutdown() {

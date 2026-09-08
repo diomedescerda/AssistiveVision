@@ -38,7 +38,6 @@ class SettingsFragment : Fragment() {
         setupBack()
         setupLanguage()
         setupSpeechRate()
-        setupCooldown()
         setupConfidence()
         setupMaxObjects()
         setupSwitches()
@@ -55,9 +54,9 @@ class SettingsFragment : Fragment() {
         val languages = listOf("Español" to "es", "English" to "en")
         val adapter = ArrayAdapter(
             requireContext(),
-            android.R.layout.simple_spinner_item,
+            R.layout.spinner_item,
             languages.map { it.first }
-        ).also { it.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item) }
+        ).also { it.setDropDownViewResource(R.layout.spinner_dropdown_item) }
         binding.languageSpinner.adapter = adapter
 
         binding.languageSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
@@ -82,19 +81,6 @@ class SettingsFragment : Fragment() {
                 val rate = 0.5f + progress * 0.1f
                 binding.speechRateValue.text = getString(R.string.settings_speech_rate_display, rate)
                 if (fromUser) viewModel.setSpeechRate(rate)
-            }
-            override fun onStartTrackingTouch(seekBar: SeekBar) {}
-            override fun onStopTrackingTouch(seekBar: SeekBar) {}
-        })
-    }
-
-    private fun setupCooldown() {
-        // SeekBar 0-45 maps to 0.5s-5.0s (step 0.1)
-        binding.cooldownSeekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
-            override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
-                val cooldown = 0.5f + progress * 0.1f
-                binding.cooldownValue.text = getString(R.string.settings_cooldown_display, cooldown)
-                if (fromUser) viewModel.setCooldown(cooldown)
             }
             override fun onStartTrackingTouch(seekBar: SeekBar) {}
             override fun onStopTrackingTouch(seekBar: SeekBar) {}
@@ -136,9 +122,6 @@ class SettingsFragment : Fragment() {
     }
 
     private fun setupSwitches() {
-        binding.switchAutoMode.setOnCheckedChangeListener { _, checked ->
-            if (!isInitializing) viewModel.setDefaultAutoMode(checked)
-        }
         binding.switchShowPreview.setOnCheckedChangeListener { _, checked ->
             if (!isInitializing) viewModel.setShowPreview(checked)
         }
@@ -164,14 +147,6 @@ class SettingsFragment : Fragment() {
         }
 
         viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.cooldown.collect { cooldown ->
-                val progress = ((cooldown - 0.5f) / 0.1f).toInt().coerceIn(0, 45)
-                binding.cooldownSeekBar.progress = progress
-                binding.cooldownValue.text = getString(R.string.settings_cooldown_display, cooldown)
-            }
-        }
-
-        viewLifecycleOwner.lifecycleScope.launch {
             viewModel.confidence.collect { conf ->
                 val progress = ((conf - 0.10f) / 0.01f).toInt().coerceIn(0, 80)
                 binding.confidenceSeekBar.progress = progress
@@ -190,12 +165,6 @@ class SettingsFragment : Fragment() {
                     )
                     btn.setTextColor(if (isSelected) 0xFFFFFFFF.toInt() else 0x80FFFFFF.toInt())
                 }
-            }
-        }
-
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.defaultAutoMode.collect { auto ->
-                binding.switchAutoMode.isChecked = auto
             }
         }
 

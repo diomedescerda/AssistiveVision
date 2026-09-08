@@ -39,6 +39,7 @@ class AudioModule(context: Context) {
         engine.setOnUtteranceProgressListener(object : UtteranceProgressListener() {
             override fun onStart(utteranceId: String?) = Unit
             override fun onDone(utteranceId: String?) { listener?.onDone() }
+            override fun onStop(utteranceId: String?, interrupted: Boolean) { listener?.onDone() }
             @Deprecated("Use onError(String, int)")
             override fun onError(utteranceId: String?) { listener?.onError() }
         })
@@ -64,13 +65,17 @@ class AudioModule(context: Context) {
         applySpeechRate()
     }
 
-    /** Interrupts current speech and speaks [text] immediately. */
-    fun speak(text: String) {
-        val engine = tts ?: return
-        if (!isReady) return
+    /** Interrupts current speech and speaks [text] immediately.
+     *
+     * @return true when the utterance was queued and [Listener.onDone] will
+     * eventually fire, false when the engine was not ready (no callback).
+     */
+    fun speak(text: String): Boolean {
+        val engine = tts ?: return false
+        if (!isReady) return false
         val utteranceId = "announcement-${System.nanoTime()}"
         engine.stop()
-        engine.speak(text, TextToSpeech.QUEUE_FLUSH, null, utteranceId)
+        return engine.speak(text, TextToSpeech.QUEUE_FLUSH, null, utteranceId) == TextToSpeech.SUCCESS
     }
 
     /** Stops any ongoing speech. */

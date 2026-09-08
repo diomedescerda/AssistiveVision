@@ -9,7 +9,7 @@ material = "1.14.0"
 activity = "1.13.0"
 constraintlayout = "2.2.1"
 camerax = "1.6.1"
-tflite = "2.16.1"
+litert = "1.4.2"
 lifecycleRuntimeKtx = "2.8.7"
 navigation = "2.7.7"
 datastorePreferences = "1.1.1"
@@ -29,7 +29,7 @@ androidx-camera-lifecycle = { module = "androidx.camera:camera-lifecycle", versi
 androidx-camera-video = { module = "androidx.camera:camera-video", version.ref = "camerax" }
 androidx-camera-view = { module = "androidx.camera:camera-view", version.ref = "camerax" }
 androidx-camera-extensions = { module = "androidx.camera:camera-extensions", version.ref = "camerax" }
-tflite = { group = "org.tensorflow", name = "tensorflow-lite", version.ref = "tflite" }
+litert = { group = "com.google.ai.edge.litert", name = "litert", version.ref = "litert" }
 androidx-lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "lifecycleRuntimeKtx" }
 androidx-navigation-fragment = { group = "androidx.navigation", name = "navigation-fragment-ktx", version.ref = "navigation" }
 androidx-navigation-ui = { group = "androidx.navigation", name = "navigation-ui-ktx", version.ref = "navigation" }
