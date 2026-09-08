@@ -18,20 +18,29 @@ import java.util.Locale
 class AudioModule(context: Context) {
 
     private val appContext: Context = context.applicationContext
+
+    @Volatile
     private var tts: TextToSpeech? = null
 
     @Volatile
     private var isReady: Boolean = false
+
+    @Volatile
     private var language: String = "es"
+
+    @Volatile
     private var speechRate: Float = 1.0f
 
     /** Optional observer notified when a spoken utterance finishes or fails. */
+    @Volatile
     var listener: Listener? = null
 
     private val initListener = TextToSpeech.OnInitListener { status ->
         if (status != TextToSpeech.SUCCESS) {
             Log.e(TAG, "TextToSpeech init failed with status=$status")
             isReady = false
+            tts?.shutdown()
+            tts = null
             listener?.onError()
             return@OnInitListener
         }
@@ -95,7 +104,7 @@ class AudioModule(context: Context) {
     private fun applyLanguage() {
         val engine = tts ?: return
         if (!isReady) return
-        val locale = if (language == "en") Locale.US else Locale("es")
+        val locale = if (language == "en") Locale.US else Locale.forLanguageTag("es")
         val result = engine.setLanguage(locale)
         if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
             Log.w(TAG, "Language $locale unavailable ($result); check voice data is installed")

@@ -31,6 +31,8 @@
     <string name="status_text_detecting">detecting</string>
     <string name="objects_count">%d objects</string>
     <string name="action_settings">Settings</string>
+    <string name="camera_permission_denied">Camera permission is required to detect objects</string>
+    <string name="tts_unavailable">Voice output unavailable</string>
 
     <!-- Settings (English) -->
     <string name="settings_title">Settings</string>

@@ -1,9 +1,13 @@
 package com.unimagdalena.assistivevision.ui
 
+import android.Manifest
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
@@ -17,9 +21,15 @@ class CameraFragment : Fragment() {
     private val binding get() = _binding!!
 
     private val viewModel: MainViewModel by activityViewModels()
-    private lateinit var captureModule: CaptureModule
+    private var captureModule: CaptureModule? = null
 
     private var isFullscreen = false
+
+    private val cameraPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { granted ->
+        if (granted) startCamera() else onPermissionDenied()
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -33,17 +43,30 @@ class CameraFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        setupCamera()
+        if (isCameraPermissionGranted()) startCamera()
+        else cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
+
         setupListeners()
         observeViewModel()
         observeSettings()
     }
 
-    private fun setupCamera() {
-        captureModule = CaptureModule(requireContext(), viewLifecycleOwner) { bitmap ->
+    private fun isCameraPermissionGranted() = ContextCompat.checkSelfPermission(
+        requireContext(), Manifest.permission.CAMERA
+    ) == PackageManager.PERMISSION_GRANTED
+
+    private fun startCamera() {
+        val module = CaptureModule(requireContext(), viewLifecycleOwner) { bitmap ->
             viewModel.processFrame(bitmap)
         }
-        captureModule.start(binding.previewView)
+        captureModule = module
+        module.start(binding.previewView)
+    }
+
+    private fun onPermissionDenied() {
+        binding.statusText.text = getString(R.string.camera_permission_denied)
+        binding.btnCapture.isEnabled = false
+        binding.btnCapture.alpha = 0.5f
     }
 
     private fun setupListeners() {
@@ -84,6 +107,9 @@ class CameraFragment : Fragment() {
         viewModel.zoneLabel.observe(viewLifecycleOwner) { label ->
             binding.zoneLabel.text = label
         }
+        viewModel.speechUnavailable.observe(viewLifecycleOwner) { unavailable ->
+            if (unavailable) binding.statusText.text = getString(R.string.tts_unavailable)
+        }
         viewModel.frozenFrame.observe(viewLifecycleOwner) { frozen ->
             binding.statusText.text = if (frozen != null) getString(R.string.status_text_detecting)
             else getString(R.string.status_ready)
@@ -105,7 +131,8 @@ class CameraFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        captureModule.shutdown()
+        captureModule?.shutdown()
+        captureModule = null
         _binding = null
     }
 }

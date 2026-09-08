@@ -3,7 +3,10 @@ package com.unimagdalena.assistivevision.modules
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Matrix
+import android.hardware.camera2.CameraCharacteristics
 import android.util.Log
+import androidx.camera.camera2.interop.Camera2CameraInfo
+import androidx.camera.core.CameraFilter
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.Preview
@@ -48,25 +51,57 @@ class CaptureModule (
                 .build()
 
             imageAnalysis.setAnalyzer(cameraExecutor) { imageProxy ->
-                val now = System.currentTimeMillis()
-                if (now - lastFrameTime >= frameIntervalMs) {
-                    lastFrameTime = now
-                    Log.d("CaptureModule", "Frame received: ${imageProxy.width}x${imageProxy.height}")
-                    val bitmap = imageProxy.toBitmap()
-                    val rotated = rotateBitmap(bitmap, imageProxy.imageInfo.rotationDegrees)
-                    onFrameReady(rotated)
+                try {
+                    val now = System.currentTimeMillis()
+                    if (now - lastFrameTime >= frameIntervalMs) {
+                        lastFrameTime = now
+                        Log.d("CaptureModule", "Frame received: ${imageProxy.width}x${imageProxy.height}")
+                        val bitmap = imageProxy.toBitmap()
+                        val rotated = rotateBitmap(bitmap, imageProxy.imageInfo.rotationDegrees)
+                        onFrameReady(rotated)
+                    }
+                } finally {
+                    imageProxy.close()
                 }
-                imageProxy.close()
             }
 
             cameraProvider.unbindAll()
             cameraProvider.bindToLifecycle(
                 lifecycleOwner,
-                CameraSelector.DEFAULT_BACK_CAMERA,
+                pickBackCameraSelector(cameraProvider),
                 preview,
                 imageAnalysis
             )
         }, ContextCompat.getMainExecutor(context))
+    }
+
+    /**
+     * Builds a selector for the back camera with the lowest focal length
+     * (0.5x ultra-wide when present, otherwise the 1x main lens).
+     * Falls back to [CameraSelector.DEFAULT_BACK_CAMERA] when focal length
+     * data is unavailable.
+     */
+    private fun pickBackCameraSelector(cameraProvider: ProcessCameraProvider): CameraSelector {
+        val backInfos = cameraProvider.availableCameraInfos.filter {
+            it.lensFacing == CameraSelector.LENS_FACING_BACK
+        }
+        val candidates = backInfos.mapNotNull { info ->
+            val camera2Info = Camera2CameraInfo.from(info)
+            val focalLengths = camera2Info.getCameraCharacteristic(
+                CameraCharacteristics.LENS_INFO_AVAILABLE_FOCAL_LENGTHS
+            )
+            if (focalLengths == null || focalLengths.isEmpty()) null
+            else camera2Info.cameraId to focalLengths
+        }
+        val winner = CameraLensPolicy.pick(candidates)
+            ?: return CameraSelector.DEFAULT_BACK_CAMERA
+
+        return CameraSelector.Builder()
+            .addCameraFilter(CameraFilter { infos ->
+                infos.filter { Camera2CameraInfo.from(it).cameraId == winner }
+                    .toMutableList()
+            })
+            .build()
     }
 
     private fun rotateBitmap(bitmap: Bitmap, degrees: Int): Bitmap {

@@ -4,6 +4,8 @@ import android.app.Application
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.RectF
+import android.os.Handler
+import android.os.Looper
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -32,6 +34,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private lateinit var audioModule: AudioModule
     private lateinit var appContext: Context
 
+    /** Latest camera frame; written on the camera executor, read on the main thread. */
+    @Volatile
     private var lastBitmap: Bitmap? = null
 
     private val _detectionCount = MutableLiveData(0)
@@ -55,10 +59,18 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private val _frozenFrame = MutableLiveData<Bitmap?>(null)
     val frozenFrame: LiveData<Bitmap?> = _frozenFrame
 
+    /** True when the TTS engine failed to initialise and voice output is unavailable. */
+    private val _speechUnavailable = MutableLiveData(false)
+    val speechUnavailable: LiveData<Boolean> = _speechUnavailable
+
     private val _confidence = MutableStateFlow(0.30f)
     private val _maxObjects = MutableStateFlow(2)
 
     private val pipelineMutex = Mutex()
+
+    /** Safety net: releases the frozen frame if TTS never reports completion. */
+    private val watchdog = Handler(Looper.getMainLooper())
+    private val watchdogRunnable = Runnable { unfreeze() }
 
     init {
         appContext = application
@@ -67,7 +79,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         audioModule = AudioModule(application)
         audioModule.listener = object : AudioModule.Listener {
             override fun onDone() = unfreeze()
-            override fun onError() = unfreeze()
+            override fun onError() {
+                _speechUnavailable.postValue(true)
+                unfreeze()
+            }
         }
 
         viewModelScope.launch {
@@ -88,7 +103,11 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun processFrame(bitmap: Bitmap) {
+        val previous = lastBitmap
         lastBitmap = bitmap
+        // Safe to recycle: captureFrame() copies the frame it freezes, so the
+        // previous frame is only referenced here once replaced.
+        previous?.recycle()
         _frameSize.postValue(bitmap.width to bitmap.height)
     }
 
@@ -96,9 +115,11 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         val bitmap = lastBitmap ?: return
         if (_isCapturing.value == true) return
         if (_frozenFrame.value != null) return
+        // Isolate the frozen frame from lastBitmap recycling by copying it.
+        val frozen = bitmap.copy(Bitmap.Config.ARGB_8888, false) ?: return
         _isCapturing.postValue(true)
-        _frozenFrame.postValue(bitmap)
-        runPipeline(bitmap)
+        _frozenFrame.postValue(frozen)
+        runPipeline(frozen)
     }
 
     private fun runPipeline(bitmap: Bitmap) {
@@ -123,7 +144,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                     val top = localized.first()
                     _zoneLabel.postValue("${top.className} · ${top.zone}")
                     val started = audioModule.speak(buildUtterance(localized))
-                    if (!started) unfreeze()
+                    if (started) armWatchdog() else unfreeze()
                 } else {
                     _zoneLabel.postValue(appContext.getString(R.string.no_detections))
                     unfreeze()
@@ -136,9 +157,24 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     private fun unfreeze() {
+        disarmWatchdog()
         _frozenFrame.postValue(null)
         _detections.postValue(emptyList())
         _zoneLabel.postValue(appContext.getString(R.string.status_ready))
+    }
+
+    /**
+     * Fallback in case the TTS engine never delivers onDone/onError (e.g. the
+     * engine process was killed); without it the frozen frame and capture
+     * button would stay stuck forever.
+     */
+    private fun armWatchdog() {
+        watchdog.removeCallbacks(watchdogRunnable)
+        watchdog.postDelayed(watchdogRunnable, SPEECH_TIMEOUT_MS)
+    }
+
+    private fun disarmWatchdog() {
+        watchdog.removeCallbacks(watchdogRunnable)
     }
 
     private fun toFrameCoordinates(detection: Detection, frameWidth: Int, frameHeight: Int): Detection {
@@ -170,7 +206,13 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     override fun onCleared() {
         super.onCleared()
+        watchdog.removeCallbacks(watchdogRunnable)
         audioModule.shutdown()
         detectionModule.close()
+    }
+
+    private companion object {
+        /** Generous upper bound for one announcement at the slowest speech rate. */
+        const val SPEECH_TIMEOUT_MS = 20_000L
     }
 }

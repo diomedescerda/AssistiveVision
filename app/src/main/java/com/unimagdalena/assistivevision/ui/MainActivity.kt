@@ -1,40 +1,26 @@
 package com.unimagdalena.assistivevision.ui
 
-import android.Manifest
-import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.WindowManager
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.activity.SystemBarStyle
 import androidx.activity.enableEdgeToEdge
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.content.ContextCompat
 import androidx.core.os.LocaleListCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
+import androidx.lifecycle.lifecycleScope
 import com.unimagdalena.assistivevision.data.SettingsManager
 import com.unimagdalena.assistivevision.databinding.ActivityMainBinding
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.launch
 import java.util.Locale
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
 
-    private val cameraPermissionLauncher = registerForActivityResult(
-        ActivityResultContracts.RequestPermission()
-    ) { granted ->
-        if (!granted) {
-            Toast.makeText(this, "Camera permission is required", Toast.LENGTH_LONG).show()
-        }
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
-        applySavedLocale()
         enableEdgeToEdge(
             statusBarStyle = SystemBarStyle.dark(android.graphics.Color.TRANSPARENT),
             navigationBarStyle = SystemBarStyle.dark(android.graphics.Color.TRANSPARENT)
@@ -51,29 +37,22 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        if (!allPermissionsGranted()) {
-            cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
-        }
+        applySavedLocale()
     }
 
-    private fun allPermissionsGranted() =
-        ContextCompat.checkSelfPermission(
-            this, Manifest.permission.CAMERA
-        ) == PackageManager.PERMISSION_GRANTED
-
-    override fun onConfigurationChanged(newConfig: android.content.res.Configuration) {
-        super.onConfigurationChanged(newConfig)
-        // The activity is not recreated on locale/layoutDirection changes
-        // (see android:configChanges), so no black flash occurs. The ViewModel
-        // already observes the language setting and re-applies it to the TTS engine.
-    }
-
+    /**
+     * Applies the persisted language asynchronously: the first frame renders
+     * with the current locale and the activity recreates itself if the saved
+     * locale differs. Avoids blocking disk I/O on the main thread.
+     */
     private fun applySavedLocale() {
-        val lang = runBlocking(Dispatchers.IO) {
-            SettingsManager(this@MainActivity).language.first()
+        lifecycleScope.launch {
+            val lang = SettingsManager(applicationContext).language.first()
+            if (AppCompatDelegate.getApplicationLocales().toLanguageTags() != lang) {
+                AppCompatDelegate.setApplicationLocales(
+                    LocaleListCompat.create(Locale.forLanguageTag(lang))
+                )
+            }
         }
-        AppCompatDelegate.setApplicationLocales(
-            LocaleListCompat.create(Locale.forLanguageTag(lang))
-        )
     }
 }
