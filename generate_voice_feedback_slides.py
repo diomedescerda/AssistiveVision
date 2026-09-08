@@ -7,7 +7,7 @@ from pptx.enum.text import PP_ALIGN, MSO_ANCHOR
 from pptx.util import Inches, Pt
 
 ROOT = Path(__file__).parent
-OUT = Path("/home/kenma/work/Research Internship/Documents/Slides/AssistiveVision_RetroalimentacionDeVoz.pptx")
+OUT = Path(__file__).parent / "AssistiveVision_RetroalimentacionDeVoz.pptx"
 
 NAVY = RGBColor(8, 15, 30)
 PANEL = RGBColor(15, 28, 49)
@@ -91,7 +91,7 @@ text(slide, "AssistiveVision\nRetroalimentacion de voz", 0.75, 1.6, 9.0, 1.7, 42
 text(slide, "Como la deteccion de objetos se convierte en patrones auditivos accionables\npara un usuario con discapacidad visual.", 0.8, 3.55, 8.6, 0.9, 19, MUTED)
 rect(slide, 0.8, 5.0, 2.2, 0.05, GREEN)
 text(slide, "MODULOS NUEVOS", 0.8, 5.35, 3.4, 0.28, 11, GREEN, True)
-text(slide, "AudioModule · PriorityFilterModule · SpeechFormatter\nAndroid TTS · Kotlin · MVVM", 0.8, 5.75, 5.5, 0.6, 15, WHITE)
+text(slide, "AudioModule · SpeechFormatter · CameraLensPolicy\nAndroid TTS · Kotlin · MVVM", 0.8, 5.75, 5.5, 0.6, 15, WHITE)
 text(slide, "AssistiveVision", 9.0, 6.75, 3.4, 0.25, 11, CYAN, True, "Courier New", PP_ALIGN.RIGHT)
 
 # 2. El problema
@@ -105,9 +105,9 @@ bullet(slide, "Deteccion en tiempo real: muchas lecturas por segundo", 0.95, 4.5
 bullet(slide, "Evitar repetir el mismo anuncio", 0.95, 5.15, 5.1, WHITE, 16, RED)
 rect(slide, 6.95, 2.6, 5.75, 3.3, PANEL, True, GRID)
 text(slide, "SOLUCION", 7.25, 2.9, 3.0, 0.25, 11, GREEN, True)
-bullet(slide, "Modo AUTOMATICO: anuncia el objeto destacado", 7.25, 3.35, 5.0, GREEN)
-bullet(slide, "Modo MANUAL: al tocar 'Hablar' anuncia lo visto", 7.25, 3.95, 5.0, GREEN)
-bullet(slide, "Filtro de prioridad limita la repeticion", 7.25, 4.55, 5.0, GREEN)
+bullet(slide, "Captura manual: toca 'Capturar' para analizar el encuadre", 7.25, 3.35, 5.0, GREEN)
+bullet(slide, "Se anuncia el objeto con mayor confianza", 7.25, 3.95, 5.0, GREEN)
+bullet(slide, "Captura congelada: una foto, un anuncio claro", 7.25, 4.55, 5.0, GREEN)
 bullet(slide, "Voz, idioma y velocidad configurables", 7.25, 5.15, 5.05, GREEN)
 
 # 3. Pipeline actualizado
@@ -118,7 +118,7 @@ steps = [
     ("02", "preprocesar", "letterbox 448×448"),
     ("03", "inferir", "EfficientDet-Lite2"),
     ("04", "localizar", "zonas · 6 regiones"),
-    ("05", "filtrar", "cooldown · top-1"),
+    ("05", "formar frase", "SpeechFormatter"),
     ("06", "hablar", "TTS es/en"),
 ]
 for i, (num, name, detail) in enumerate(steps):
@@ -133,8 +133,8 @@ for i, (num, name, detail) in enumerate(steps):
         text(slide, ">", x + 1.86, 3.0, 0.3, 0.35, 20, GREEN, True, "Courier New", PP_ALIGN.CENTER)
 text(slide, "NUEVO", 0.4, 4.35, 1.5, 0.25, 11, GREEN, True)
 rect(slide, 0.55, 4.68, 12.2, 0.09, GRID)
-text(slide, "AudioModule y PriorityFilterModule ahora viven en el flujo:", 0.58, 5.1, 10.5, 0.3, 16, MUTED)
-bullet(slide, "Se decide si hablar (cooldown) y que decir (frase localizada)", 0.85, 5.6, 9.5, WHITE, 16, GREEN)
+text(slide, "AudioModule y SpeechFormatter ahora viven en el flujo:", 0.58, 5.1, 10.5, 0.3, 16, MUTED)
+bullet(slide, "Se arma la frase localizada y el TTS la pronuncia al instante", 0.85, 5.6, 9.5, WHITE, 16, GREEN)
 
 # 4. AudioModule
 slide = base("AudioModule: wrapper de TextToSpeech", "04 / MODULO DE AUDIO")
@@ -153,20 +153,20 @@ bullet(slide, "La vista / ViewModel no toca el motor directamente", 7.25, 3.85, 
 bullet(slide, "Lista para intercambiar por Piper (offline) sin tocar llamadores", 7.25, 4.65, 5.2, GREEN, 15, CYAN)
 text(slide, "Piper · sherpa-onnx  →  mismo `speak()`, motor distinto", 6.95, 6.35, 5.75, 0.3, 13, MUTED, False, "Courier New")
 
-# 5. PriorityFilterModule
-slide = base("Evita anunciar lo mismo repetidas veces", "05 / CONTROL DE REPETICION")
-text(slide, "En modo automatico llegan varios frames por segundo. Sin filtro, la misma silla\nse anunciaria sin parar.", 0.58, 1.3, 9.4, 0.75, 18, WHITE)
+# 5. Captura manual
+slide = base("Una captura, un anuncio claro", "05 / CONTROL DE REPETICION")
+text(slide, "La deteccion corre solo cuando el usuario la pide. Sin filtro ni cadenas de\nanuncios repetidos.", 0.58, 1.3, 9.4, 0.75, 18, WHITE)
 rect(slide, 0.6, 2.5, 6.05, 2.9, PANEL, True, GRID)
 text(slide, "REGLA", 0.9, 2.78, 2.0, 0.2, 11, CYAN, True)
-bullet(slide, "Mismo objeto destacado + dentro del cooldown  → NO habla", 0.9, 3.25, 5.4, WHITE, 15, RED)
-bullet(slide, "Cambia la clase o la zona  → habla de inmediato", 0.9, 3.95, 5.4, WHITE, 15, GREEN)
-bullet(slide, "Cooldown configurable: 0.5 s a 5.0 s", 0.9, 4.65, 5.4, WHITE, 15, CYAN)
+bullet(slide, "Toca 'Capturar'  → el encuadre se congela y se analiza", 0.9, 3.25, 5.4, WHITE, 15, GREEN)
+bullet(slide, "Habla el objeto destacado; al terminar, se libera el encuadre", 0.9, 3.95, 5.4, WHITE, 15, GREEN)
+bullet(slide, "QUEUE_FLUSH interrumpe la voz obsoleta si vuelves a capturar", 0.9, 4.65, 5.4, WHITE, 15, CYAN)
 rect(slide, 7.0, 2.5, 5.75, 2.9, PANEL, True, GRID)
 text(slide, "IMPLEMENTACION", 7.3, 2.78, 3.2, 0.2, 11, ORANGE, True)
-bullet(slide, "Kotlin puro, sin dependencias de Android", 7.3, 3.25, 5.0)
-bullet(slide, "reset() al cambiar de modo", 7.3, 3.95, 5.1)
-bullet(slide, "7 pruebas unitarias", 7.3, 4.65, 5.0, GREEN, 15, GREEN)
-text(slide, "shouldAnnounce(detections, cooldownMs, now) → Boolean", 0.6, 5.75, 12.0, 0.35, 14, CYAN, False, "Courier New")
+bullet(slide, "Un solo anuncio activo a la vez (MainViewModel)", 7.3, 3.25, 5.0)
+bullet(slide, "Watchdog: nunca se queda pegado si el TTS falla", 7.3, 3.95, 5.1)
+bullet(slide, "Boton de captura se deshabilita durante la captura", 7.3, 4.65, 5.0, GREEN, 15, GREEN)
+text(slide, "captureFrame() → runPipeline() → speak() → onDone → unfreeze()", 0.6, 5.75, 12.0, 0.35, 14, CYAN, False, "Courier New")
 
 # 6. Salida localizada
 slide = base("Cada objeto se dice en tu idioma", "06 / SPEECHFORMATTER")
@@ -192,7 +192,7 @@ slide = base("Las preferencias llegan al audio al instante", "07 / CONFIGURACION
 settings_cards = [
     ("IDIOMA", "es / en", "motor TTS y strings"),
     ("VELOCIDAD", "0.5x – 2.5x", "applySpeechRate"),
-    ("COOLDOWN", "0.5 s – 5.0 s", "PriorityFilter"),
+    ("VISTA PREVIA", "on / off", "OverlayView"),
     ("CONFIANZA", "0.10 – 0.90", "DetectionModule"),
     ("MAX. OBJETOS", "1 – 3", "top-N anunciados"),
 ]
@@ -204,7 +204,7 @@ for i, (label, value, body) in enumerate(settings_cards):
     text(slide, body, x + 0.16, 3.45, 1.9, 0.25, 10, MUTED, False, "Courier New")
 rect(slide, 0.6, 4.55, 11.95, 1.6, PANEL, True, GRID)
 text(slide, "FLUJO DE PREFERENCIAS", 0.95, 4.85, 3.0, 0.22, 11, ORANGE, True)
-text(slide, "DataStore (persistente)  →  SettingsManager  →  MainViewModel (collect)  →  AudioModule / PriorityFilter", 3.95, 4.82, 8.2, 0.35, 14, WHITE, False, "Courier New")
+text(slide, "DataStore (persistente)  →  SettingsManager  →  MainViewModel (collect)  →  AudioModule", 3.95, 4.82, 8.2, 0.35, 14, WHITE, False, "Courier New")
 bullet(slide, "Los cambios se reflejan sin reiniciar la app", 0.9, 5.6, 9.0, WHITE, 15, GREEN)
 
 # 8. Como probar
@@ -221,19 +221,19 @@ for i, (num, cmd) in enumerate(req):
     text(slide, num, 0.6, y + 0.12, 0.5, 0.25, 15, CYAN, True, "Courier New", PP_ALIGN.CENTER)
     text(slide, cmd, 1.35, y + 0.11, 11.0, 0.35, 16, WHITE, True, "Courier New")
 text(slide, "En la app:", 0.62, 5.1, 2.0, 0.3, 14, MUTED, True)
-bullet(slide, "AUTO: apunta la camara a objetos — escucharas 'silla, frente a ti'", 0.9, 5.6, 11.0, WHITE, 15, GREEN)
-bullet(slide, "MANUAL: pulsa 'Hablar' y repite el anuncio al instante", 0.9, 6.2, 11.0, WHITE, 15, CYAN)
-bullet(slide, "Configuracion: cambia idioma, velocidad, cooldown y confianza", 0.9, 6.8, 11.0, WHITE, 15, ORANGE)
+bullet(slide, "MANUAL: apunta la camara y toca 'Capturar' — escucharas 'silla, frente a ti'", 0.9, 5.6, 11.0, WHITE, 15, GREEN)
+bullet(slide, "Prueba la lente 0.5x: la app elige la camara de menor distancia focal", 0.9, 6.2, 11.0, WHITE, 15, CYAN)
+bullet(slide, "Configuracion: cambia idioma, velocidad, confianza y maximo de objetos", 0.9, 6.8, 11.0, WHITE, 15, ORANGE)
 
 # 9. Proximos pasos
 slide = base("Estado actual y siguientes pasos", "09 / CIERRE")
 rect(slide, 0.62, 1.5, 5.9, 4.4, PANEL, True, GRID)
 text(slide, "IMPLEMENTADO", 0.95, 1.78, 3.0, 0.25, 11, GREEN, True)
 bullet(slide, "AudioModule (TTS de plataforma) — listo", 0.95, 2.25, 5.2)
-bullet(slide, "PriorityFilterModule y 7 tests — listo", 0.95, 2.95, 5.2)
+bullet(slide, "Captura manual + watchdog de voz — listo", 0.95, 2.95, 5.2)
 bullet(slide, "SpeechFormatter + LocalizedLabels — listo", 0.95, 3.65, 5.3)
-bullet(slide, "Preferencias conectadas al audio — listo", 0.95, 4.35, 5.3)
-bullet(slide, "12 pruebas unitarias · lint limpio", 0.95, 5.05, 5.3, GREEN, 15, GREEN)
+bullet(slide, "Lente 0.5x con fallback a 1x — listo", 0.95, 4.35, 5.3)
+bullet(slide, "SpeechFormatter + LocalizationModule: pruebas unitarias · lint limpio", 0.95, 5.05, 5.3, GREEN, 15, GREEN)
 rect(slide, 6.95, 1.5, 5.75, 4.4, PANEL, True, GRID)
 text(slide, "PROXIMO", 7.25, 1.78, 3.0, 0.25, 11, ORANGE, True)
 bullet(slide, "Piper / sherpa-onnx: TTS offline con la misma interfaz", 7.25, 2.25, 5.15)
