@@ -79,7 +79,12 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         detectionModule = DetectionModule(application)
         audioModule = AudioModule(application)
         audioModule.listener = object : AudioModule.Listener {
+            override fun onReady() {
+                _speechUnavailable.postValue(false)
+            }
+
             override fun onDone() = unfreeze()
+
             override fun onError() {
                 _speechUnavailable.postValue(true)
                 unfreeze()

@@ -6,3 +6,8 @@
 # Keep model metadata annotation types if present
 -keep class org.tensorflow.lite.support.** { *; }
 -dontwarn org.tensorflow.lite.support.**
+
+# Sherpa-ONNX offline TTS — native code resolves Kotlin classes and native
+# methods by name through JNI.
+-keep class com.k2fsa.sherpa.onnx.** { *; }
+-dontwarn com.k2fsa.sherpa.onnx.**
