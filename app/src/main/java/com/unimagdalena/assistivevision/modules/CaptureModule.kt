@@ -6,6 +6,7 @@ import android.graphics.Matrix
 import android.hardware.camera2.CameraCharacteristics
 import android.util.Log
 import androidx.camera.camera2.interop.Camera2CameraInfo
+import androidx.camera.camera2.interop.ExperimentalCamera2Interop
 import androidx.camera.core.CameraFilter
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageAnalysis
@@ -81,6 +82,7 @@ class CaptureModule (
      * Falls back to [CameraSelector.DEFAULT_BACK_CAMERA] when focal length
      * data is unavailable.
      */
+    @androidx.annotation.OptIn(ExperimentalCamera2Interop::class)
     private fun pickBackCameraSelector(cameraProvider: ProcessCameraProvider): CameraSelector {
         val backInfos = cameraProvider.availableCameraInfos.filter {
             it.lensFacing == CameraSelector.LENS_FACING_BACK
