@@ -1,64 +1,66 @@
 # AssistiveVision
 
-An Android application that provides real-time object detection assistance for visually impaired users. The app uses the device camera to detect objects in the environment and provides spatial localization with multi-language support.
+An Android application that provides object detection assistance for visually impaired users. The app uses the device camera to capture a frame on demand, detects objects with on-device machine learning, and reports what it sees out loud with spatial localization in English or Spanish.
 
 ## About
 
-AssistiveVision leverages on-device machine learning to help visually impaired individuals navigate their surroundings independently. Using EfficientDet-Lite2 for real-time object detection, the app identifies everyday objects like people, chairs, tables, and more, then displays bounding boxes and spoken feedback about their location. The system is designed for immersive full-screen use, capturing the user's natural field of view as they move through indoor environments.
+AssistiveVision leverages on-device machine learning to help visually impaired individuals understand their surroundings independently. Using EfficientDet-Lite2, the app identifies everyday objects like people, chairs, and tables, draws bounding boxes over the frozen frame, and speaks a localized announcement such as "silla, inferior izquierda" ("chair, lower left"). The system is designed for immersive full-screen use, capturing the user's natural field of view.
 
 ## Features
 
-- **Real-time object detection** using EfficientDet-Lite2 TFLite model
-- **Camera integration** with CameraX for live preview and frame analysis
+- **Manual capture workflow** — tap "Capture" to freeze the current frame; one tap, one clear announcement
+- **Object detection** using the EfficientDet-Lite2 TFLite model (LiteRT)
+- **Smart lens selection** — binds the 0.5x ultra-wide camera when the phone has one, otherwise the lowest-focal-length (1x) back camera
+- **Camera permission gating** — the camera only starts after permission is granted; denial is shown in-app, localized
 - **10 target object classes**: person, chair, couch, bed, table, toilet, tv, computer, sink, refrigerator
-- **Detection overlay** with teal-colored bounding boxes and label tags
-- **AUTO / MANUAL modes** — continuous detection or on-demand capture
-- **Spatial localization** — zones like "center bottom", "left top" etc.
-- **Spoken announcements** — Android text-to-speech reports detected objects with
-  localized names and zones (e.g. "silla, frente a ti"), throttled by a cooldown.
-- **Multi-language support** — English and Spanish via Android string resources
-- **Immersive full-screen** — system bars hidden, edge-to-edge layout
-- **Pipeline mutex** — skips frames if the pipeline is busy, matching CameraX KEEP_ONLY_LATEST strategy
-- **Optimized inference pipeline** with 9 FPS cap and bitmap recycling to reduce GC pressure
+- **Detection overlay** with teal bounding boxes, a dark visibility halo, and label tags (font-scale aware)
+- **Spatial localization** — zones like "bottom center", "top left", etc.
+- **Spoken announcements** — Android text-to-speech reports detected objects with localized names and zones (e.g. "silla, inferior izquierda"), localized for English and Spanish
+- **Settings** — language, speech rate (0.5x–2.5x), confidence threshold (0.10–0.90), max announced objects (1–3), preview visibility
+- **Per-app language switching** — instant EN/ES switch via `AppCompatDelegate` with platform `localeConfig`
+- **Accessibility** — WCAG-AA contrast, button roles and labels for TalkBack, live-region status row
+- **Robust lifecycle** — interpreter close race guarded, image proxies closed in `finally`, TTS watchdog prevents stuck captures
+- **Release hardening** — R8 minification + resource shrinking, configurable release signing
 
 ## Architecture
 
 The app follows a fragment-based MVVM architecture:
 
 ```
-CameraX Capture → Preprocessing → TFLite Detection → Localization → Overlay / Audio
+CameraX Capture → Preprocessing (letterbox) → TFLite Detection → Inverse mapping → Localization → SpeechFormatter → TTS
 ```
 
 ### Modules
 
 | Module | Description |
 |--------|-------------|
-| `CaptureModule` | CameraX integration with configurable frame rate (9 FPS) |
-| `PreprocessingModule` | Letterbox resize to 448x448 with RGB tensor conversion and bitmap recycling |
-| `DetectionModule` | TFLite EfficientDet-Lite2 inference with COCO class mapping and confidence filtering |
+| `CaptureModule` | CameraX integration: preview + ImageAnalysis, 9 FPS frame throttle, lens selection |
+| `CameraLensPolicy` | Pure lens-choice logic: lowest focal length among back cameras (0.5x if present) |
+| `PreprocessingModule` | Letterbox resize to 448x448 with RGB uint8 tensor conversion; geometry from `LetterboxMapper` |
+| `DetectionModule` | LiteRT EfficientDet-Lite2 inference with COCO class mapping, confidence filtering, synchronized close |
 | `LocalizationModule` | Spatial zone computation (left/center/right × top/bottom) |
-| `PriorityFilterModule` | Cooldown-based suppression of repeated announcements of the same top object |
-| `AudioModule` | Android TextToSpeech wrapper (ready gating, language/speech-rate, QUEUE_FLUSH) |
+| `AudioModule` | Android TextToSpeech wrapper (ready gating, language/speech-rate, QUEUE_FLUSH, failure listener) |
 
 ### UI
 
 | Component | Description |
 |-----------|-------------|
-| `MainActivity` | Edge-to-edge immersive host with Navigation Component |
-| `CameraFragment` | Camera preview, overlay, mode toggle, status bar, and action buttons |
-| `SettingsFragment` | Language selection via Spinner |
-| `OverlayView` | Custom View drawing teal bounding boxes and label tags over detections |
+| `MainActivity` | Edge-to-edge immersive host with Navigation Component; applies the saved locale asynchronously |
+| `CameraFragment` | Permission-gated camera preview, overlay, status bar, capture/settings actions |
+| `SettingsFragment` | Language, speech rate, confidence, max objects, preview visibility |
+| `OverlayView` | Custom View drawing bounding boxes and label tags over the frozen frame |
 
 ### Data Flow
 
-1. **CaptureModule** captures frames at 9 FPS using CameraX ImageAnalysis
-2. **PreprocessingModule** converts frames to 448x448 uint8 tensors with letterbox padding (recycles intermediate bitmaps)
-3. **DetectionModule** runs EfficientDet-Lite2 inference, filters to target COCO classes
-4. **LocalizationModule** assigns spatial zones to each detection
-5. **PriorityFilterModule** gates whether the top detection should be announced (cooldown, immediate on manual capture)
-6. **AudioModule** speaks a localized announcement ("silla, frente a ti") built by `SpeechFormatter`
-7. **MainViewModel** exposes detections, zone labels, FPS, and detection count via LiveData
-8. **CameraFragment** observes LiveData and updates the OverlayView and status UI
+1. **CaptureModule** keeps the latest frame available (throttled to 9 FPS via ImageAnalysis)
+2. The user taps **Capture**; the frame is frozen and copied for the pipeline
+3. **PreprocessingModule** letterboxes the frame to 448x448 using shared `LetterboxMapper` geometry (gray 114 padding)
+4. **DetectionModule** runs EfficientDet-Lite2 inference, filters to target COCO classes by confidence
+5. Detections are mapped back to frame coordinates with the same `LetterboxMapper` (exact forward/inverse consistency)
+6. **LocalizationModule** assigns spatial zones to each detection
+7. **SpeechFormatter** assembles the localized sentence (pure, unit-testable)
+8. **AudioModule** speaks it; when the utterance finishes (or a watchdog fires), the frozen frame is released
+9. **MainViewModel** exposes detections, zone labels, detection count, and capture state via LiveData; **CameraFragment** updates the OverlayView and status UI
 
 Spoken object names and zone labels are resolved through localized string resources
 (`LocalizedLabels`), keeping the sentence assembly in `SpeechFormatter` pure and unit-testable.
@@ -67,14 +69,15 @@ Spoken object names and zone labels are resolved through localized string resour
 
 - **Language**: Kotlin
 - **Camera**: CameraX 1.6.1
-- **ML Framework**: TensorFlow Lite 2.16.1
+- **ML Framework**: LiteRT (com.google.ai.edge.litert 1.4.2, TFLite `Interpreter` API)
 - **Model**: EfficientDet-Lite2 (efficientdet-lite2-detection-metadata.tflite)
 - **Navigation**: Navigation Component 2.7.7
+- **Preferences**: Jetpack DataStore 1.1.1
 - **Architecture**: MVVM with ViewModel and LiveData
 - **UI**: Fragment-based with View Binding
 - **Min SDK**: 26 (Android 8.0)
 - **Target SDK**: 36
-- **Compile SDK**: 37
+- **Compile SDK**: 37.1
 
 ## Performance
 
@@ -86,29 +89,33 @@ Based on benchmark testing on Snapdragon 685:
 | Input Size | 448x448 |
 | Inference Latency | ~137.8 ms |
 | FPS | ~8.55 |
-| Target FPS | 9 (optimized for throughput) |
+| Frame throttle | 9 (matched to model throughput) |
 
 ## Project Structure
 
 ```
 app/src/main/java/com/unimagdalena/assistivevision/
 ├── modules/
-│   ├── CaptureModule.kt          # Camera capture and frame delivery
-│   ├── PreprocessingModule.kt    # Image preprocessing, tensor conversion, bitmap recycling
-│   ├── DetectionModule.kt        # TFLite inference, COCO class mapping, confidence filtering
+│   ├── CaptureModule.kt          # Camera capture, lens selection, frame delivery
+│   ├── CameraLensPolicy.kt       # Pure 0.5x / lowest-focal-length lens decision
+│   ├── PreprocessingModule.kt    # Letterbox preprocessing, tensor conversion
+│   ├── DetectionModule.kt        # LiteRT inference, COCO mapping, synchronized close
 │   ├── LocalizationModule.kt     # Spatial zone computation
-│   ├── PriorityFilterModule.kt   # Cooldown-based announcement throttling
 │   └── AudioModule.kt            # Text-to-speech wrapper (language, rate, QUEUE_FLUSH)
 ├── viewmodel/
-│   └── MainViewModel.kt          # Pipeline orchestration, LiveData, mutex concurrency
+│   ├── MainViewModel.kt          # Pipeline orchestration, frozen-frame state, watchdog
+│   └── SettingsViewModel.kt      # Settings passthrough to the UI
 ├── model/
 │   ├── Detection.kt              # Detection data class (classId, className, score, bbox, zone)
+│   ├── LetterboxMapper.kt        # Pure forward/inverse letterbox geometry (tested)
 │   ├── SpeechFormatter.kt        # Pure, testable announcement sentence assembly
 │   └── LocalizedLabels.kt        # Class-name and zone labels from string resources
+├── data/
+│   └── SettingsManager.kt        # DataStore-backed preferences
 └── ui/
-    ├── MainActivity.kt           # Immersive edge-to-edge host, permission handling
-    ├── CameraFragment.kt         # Camera preview, overlay, mode toggle, status UI
-    ├── SettingsFragment.kt       # Language selection
+    ├── MainActivity.kt           # Immersive edge-to-edge host, async locale
+    ├── CameraFragment.kt         # Permission-gated preview, capture flow
+    ├── SettingsFragment.kt       # Settings UI
     └── OverlayView.kt            # Custom View drawing detection boxes and labels
 ```
 
@@ -116,9 +123,9 @@ app/src/main/java/com/unimagdalena/assistivevision/
 
 ### Prerequisites
 
-- Android Studio with Kotlin support
+- Android Studio (Gradle 9.5 / AGP 9.3.1, JDK 21 — Android Studio's bundled JBR works)
 - Android device or emulator with API 26+
-- Camera permission (required for object detection)
+- Camera permission (requested on first launch; required for object detection)
 
 ### Installation
 
@@ -135,16 +142,33 @@ app/src/main/java/com/unimagdalena/assistivevision/
 
 ### Usage
 
-1. Grant camera permission when prompted
-2. The app starts in AUTO mode — point the camera at objects and detection boxes appear in real time; the top object is announced by voice (gated by the cooldown)
-3. Switch to MANUAL mode to capture frames on demand using the Speak button (announces immediately)
-4. Access Settings to change the language, speech rate, cooldown, or confidence
+1. Grant camera permission when prompted (denial is explained in-app; re-request happens on next launch of the screen)
+2. Point the camera at an object and tap **Capture** — the frame freezes, the most confident object is announced (e.g. "silla, inferior izquierda"), and boxes are drawn over the frozen frame
+3. Open **Settings** to change the language, speech rate, confidence threshold, maximum announced objects, or preview visibility
+
+### Release signing
+
+Release builds use R8 minification. Signing reads `keystore.properties` at the repo root:
+
+```properties
+storeFile=/absolute/or/relative/path/to/keystore.jks
+storePassword=...
+keyAlias=...
+keyPassword=...
+```
+
+When the file is absent, release builds fall back to the debug signing config so `assembleRelease` always works locally.
 
 ## Tests
 
-- `./gradlew test` runs local unit tests for `PriorityFilterModule` (cooldown
-  suppression) and `SpeechFormatter` (announcement assembly), plus instrumented
-  tests on device.
+`.\gradlew :app:testDebugUnitTest` (or `./gradlew ...`) runs the local unit test suite:
+
+- `SpeechFormatterTest` — announcement sentence assembly
+- `LocalizationModuleTest` — all six zones, threshold boundaries, degenerate frame sizes
+- `LetterboxMapperTest` — forward geometry, inverse round-trip, padding edges
+- `CameraLensPolicyTest` — ultra-wide preference, fallbacks, no-data handling
+
+Instrumented tests run on device via `connectedDebugAndroidTest`.
 
 ## Configuration
 
@@ -153,17 +177,22 @@ app/src/main/java/com/unimagdalena/assistivevision/
 In `DetectionModule.kt`:
 
 ```kotlin
-const val CONFIDENCE_THRESHOLD = 0.30f  // Minimum detection confidence
-const val MAX_DETECTIONS = 15           // Maximum objects to track
+const val MAX_DETECTIONS = 15  // Maximum detections kept per inference
 ```
+
+The confidence threshold is a runtime setting (DataStore default `0.30f`, configurable 0.10–0.90 in Settings) and is passed to `detect()` from `MainViewModel`.
 
 ### Frame Rate
 
 In `CaptureModule.kt`:
 
 ```kotlin
-const val maxFps = 9  // Frames per second (matched to model throughput)
+private val maxFps: Int = 9  // Frames per second (matched to model throughput)
 ```
+
+### Lens Selection
+
+`CaptureModule` binds the back camera with the lowest available focal length via `CameraLensPolicy` — the 0.5x ultra-wide lens on phones that have one, otherwise the 1x main lens. Without focal-length data it falls back to the default back camera.
 
 ## Target Object Classes
 
@@ -192,10 +221,10 @@ The app detects the following 10 object classes from MS COCO dataset:
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the Apache License 2.0 — see the [LICENSE](LICENSE) file for details.
 
 ## Acknowledgments
 
-- TensorFlow Lite team for EfficientDet-Lite2 model
+- The EfficientDet-Lite2 model and the LiteRT team
 - Android CameraX library for camera integration
 - COCO dataset for object detection training data
