@@ -13,6 +13,7 @@ import androidx.lifecycle.viewModelScope
 import com.unimagdalena.assistivevision.R
 import com.unimagdalena.assistivevision.data.SettingsManager
 import com.unimagdalena.assistivevision.model.Detection
+import com.unimagdalena.assistivevision.model.FrameStore
 import com.unimagdalena.assistivevision.model.LetterboxMapper
 import com.unimagdalena.assistivevision.model.LocalizedLabels
 import com.unimagdalena.assistivevision.model.SpeechFormatter
@@ -35,9 +36,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private lateinit var audioModule: AudioModule
     private lateinit var appContext: Context
 
-    /** Latest camera frame; written on the camera executor, read on the main thread. */
-    @Volatile
-    private var lastBitmap: Bitmap? = null
+    /** Owns the latest camera frame; swap/copy/recycle are lock-serialized. */
+    private val frameStore = FrameStore()
 
     private val _detectionCount = MutableLiveData(0)
     val detectionCount: LiveData<Int> = _detectionCount
@@ -109,20 +109,16 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun processFrame(bitmap: Bitmap) {
-        val previous = lastBitmap
-        lastBitmap = bitmap
-        // Safe to recycle: captureFrame() copies the frame it freezes, so the
-        // previous frame is only referenced here once replaced.
-        previous?.recycle()
+        frameStore.update(bitmap)
         _frameSize.postValue(bitmap.width to bitmap.height)
     }
 
     fun captureFrame() {
-        val bitmap = lastBitmap ?: return
         if (_isCapturing.value == true) return
         if (_frozenFrame.value != null) return
-        // Isolate the frozen frame from lastBitmap recycling by copying it.
-        val frozen = bitmap.copy(Bitmap.Config.ARGB_8888, false) ?: return
+        // The store hands out an isolated copy, so the camera thread may
+        // recycle the original frame while the pipeline still runs.
+        val frozen = frameStore.copy() ?: return
         _isCapturing.postValue(true)
         _frozenFrame.postValue(frozen)
         runPipeline(frozen)
@@ -215,6 +211,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         watchdog.removeCallbacks(watchdogRunnable)
         audioModule.shutdown()
         detectionModule.close()
+        frameStore.clear()
     }
 
     private companion object {

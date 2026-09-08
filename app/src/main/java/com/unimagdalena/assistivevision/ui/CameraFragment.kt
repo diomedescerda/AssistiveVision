@@ -2,6 +2,7 @@ package com.unimagdalena.assistivevision.ui
 
 import android.Manifest
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -27,6 +28,9 @@ class CameraFragment : Fragment() {
     private var isFullscreen = false
     private var isCapturing = false
     private var permissionDenied = false
+
+    /** Frozen bitmap currently shown; recycled once replaced or cleared. */
+    private var displayedFrozen: Bitmap? = null
 
     private val cameraPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
@@ -154,6 +158,12 @@ class CameraFragment : Fragment() {
                 binding.capturedImage.setImageDrawable(null)
                 binding.capturedImage.visibility = View.GONE
             }
+            // This observer runs on the main thread, so once the ImageView no
+            // longer references the previous bitmap it can be recycled safely.
+            if (displayedFrozen != null && displayedFrozen !== frozen) {
+                displayedFrozen?.recycle()
+            }
+            displayedFrozen = frozen
         }
     }
 

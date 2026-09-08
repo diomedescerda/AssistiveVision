@@ -187,6 +187,7 @@ class AudioModule(context: Context) {
     // ------------------------------------------------------------------
 
     private fun runSpeak(text: String, utterance: Utterance) {
+        var completed = false
         try {
             val engine = ensureVoice(language)
             ready = true
@@ -204,6 +205,7 @@ class AudioModule(context: Context) {
             requestAudioFocus()
             newTrack.play()
 
+            var writeFailed = false
             val started = SystemClock.elapsedRealtime()
             val audio = engine.generateWithCallback(
                 text = text,
@@ -214,7 +216,12 @@ class AudioModule(context: Context) {
                 if (t == null || t.playState != AudioTrack.PLAYSTATE_PLAYING) {
                     return@generateWithCallback 0
                 }
-                t.write(samples, 0, samples.size, AudioTrack.WRITE_BLOCKING)
+                val written = t.write(samples, 0, samples.size, AudioTrack.WRITE_BLOCKING)
+                if (written < 0 || written < samples.size) {
+                    Log.e(TAG, "AudioTrack write failed ($written of ${samples.size} samples)")
+                    writeFailed = true
+                    return@generateWithCallback 0
+                }
                 if (utterance.aborted.get()) 0 else 1
             }
             Log.i(
@@ -224,8 +231,13 @@ class AudioModule(context: Context) {
             )
 
             if (utterance.aborted.get()) return
+            if (writeFailed) {
+                failed = true
+                postError()
+                return
+            }
             drain(audio.samples.size)
-            postDone()
+            completed = true
         } catch (t: Throwable) {
             Log.e(TAG, "Speech generation failed", t)
             failed = true
@@ -234,6 +246,9 @@ class AudioModule(context: Context) {
             releaseTrack()
             abandonAudioFocus()
         }
+        // Notify completion only after the track and audio focus are fully
+        // released so the UI never re-captures while teardown is in flight.
+        if (completed) postDone()
     }
 
     /** Blocks until all queued PCM has been played, or the utterance is aborted. */
