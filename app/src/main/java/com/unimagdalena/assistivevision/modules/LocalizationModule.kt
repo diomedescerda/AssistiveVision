@@ -20,8 +20,9 @@ class LocalizationModule {
     }
 
     private fun getZone(centerX: Float, centerY: Float, frameWidth: Int, frameHeight: Int): String {
-        val normalizedX = centerX / frameWidth
-        val normalizedY = centerY / frameHeight
+        // Guard against degenerate frame sizes (never divide by zero / NaN)
+        val normalizedX = centerX / frameWidth.coerceAtLeast(1)
+        val normalizedY = centerY / frameHeight.coerceAtLeast(1)
 
         val hZone = when {
             normalizedX < LEFT_THRESHOLD -> "left"

@@ -33,4 +33,22 @@ class SpeechFormatterTest {
         val items = listOf("mesa" to "al centro")
         assertEquals("mesa, al centro", SpeechFormatter.announce(items))
     }
+
+    @Test
+    fun three_or_more_items_keep_declaration_order() {
+        val items = listOf(
+            "persona" to "a la derecha",
+            "silla" to "frente a ti",
+            "cama" to "abajo a la izquierda"
+        )
+        assertEquals(
+            "persona, a la derecha; silla, frente a ti; cama, abajo a la izquierda",
+            SpeechFormatter.announce(items)
+        )
+    }
+
+    @Test
+    fun blank_zone_is_passed_through_untouched() {
+        assertEquals("silla, ", SpeechFormatter.announce("silla", ""))
+    }
 }

@@ -5,6 +5,7 @@ import android.graphics.Canvas
 import android.graphics.Color
 import androidx.core.graphics.createBitmap
 import androidx.core.graphics.scale
+import com.unimagdalena.assistivevision.model.LetterboxMapper
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 
@@ -29,19 +30,13 @@ class PreprocessingModule(private val inputSize: Int = 448) {
     }
 
     private fun letterboxResize(bitmap: Bitmap): Bitmap {
-        val srcW = bitmap.width
-        val srcH = bitmap.height
-        val scale = minOf(inputSize.toFloat() / srcW, inputSize.toFloat() / srcH)
-        val dstW = (srcW * scale).toInt()
-        val dstH = (srcH * scale).toInt()
-        val dx = (inputSize - dstW) / 2
-        val dy = (inputSize - dstH) / 2
+        val geometry = LetterboxMapper.forward(bitmap.width, bitmap.height, inputSize)
 
         val output = createBitmap(inputSize, inputSize)
         val canvas = Canvas(output)
         canvas.drawColor(Color.rgb(114, 114, 114))
-        val resized = bitmap.scale(dstW, dstH)
-        canvas.drawBitmap(resized, dx.toFloat(), dy.toFloat(), null)
+        val resized = bitmap.scale(geometry.dstWidth, geometry.dstHeight)
+        canvas.drawBitmap(resized, geometry.dx, geometry.dy, null)
         resized.recycle()
         return output
     }

@@ -13,6 +13,7 @@ import androidx.lifecycle.viewModelScope
 import com.unimagdalena.assistivevision.R
 import com.unimagdalena.assistivevision.data.SettingsManager
 import com.unimagdalena.assistivevision.model.Detection
+import com.unimagdalena.assistivevision.model.LetterboxMapper
 import com.unimagdalena.assistivevision.model.LocalizedLabels
 import com.unimagdalena.assistivevision.model.SpeechFormatter
 import com.unimagdalena.assistivevision.modules.AudioModule
@@ -181,21 +182,18 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     private fun toFrameCoordinates(detection: Detection, frameWidth: Int, frameHeight: Int): Detection {
-        val inputSize = DetectionModule.INPUT_SIZE.toFloat()
-        val scale = minOf(inputSize / frameWidth, inputSize / frameHeight)
-        val dx = (inputSize - frameWidth * scale) / 2f
-        val dy = (inputSize - frameHeight * scale) / 2f
-        return Detection(
-            classId = detection.classId,
-            className = detection.className,
-            score = detection.score,
+        val geometry = LetterboxMapper.forward(frameWidth, frameHeight, DetectionModule.INPUT_SIZE)
+        return detection.copy(
             bbox = RectF(
-                (detection.bbox.left - dx) / scale,
-                (detection.bbox.top - dy) / scale,
-                (detection.bbox.right - dx) / scale,
-                (detection.bbox.bottom - dy) / scale
-            ),
-            zone = detection.zone
+                LetterboxMapper.toFrameX(detection.bbox.left, geometry, frameWidth)
+                    .coerceIn(0f, frameWidth.toFloat()),
+                LetterboxMapper.toFrameY(detection.bbox.top, geometry, frameHeight)
+                    .coerceIn(0f, frameHeight.toFloat()),
+                LetterboxMapper.toFrameX(detection.bbox.right, geometry, frameWidth)
+                    .coerceIn(0f, frameWidth.toFloat()),
+                LetterboxMapper.toFrameY(detection.bbox.bottom, geometry, frameHeight)
+                    .coerceIn(0f, frameHeight.toFloat())
+            )
         )
     }
 
