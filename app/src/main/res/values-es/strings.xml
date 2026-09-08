@@ -33,6 +33,15 @@
     <string name="action_settings">Configuración</string>
     <string name="camera_permission_denied">Se requiere permiso de cámara para detectar objetos</string>
     <string name="tts_unavailable">Salida de voz no disponible</string>
+    <string name="status_active_a11y">Activo</string>
+
+    <!-- Nombres cortos de zona para la etiqueta en pantalla -->
+    <string name="zone_short_left_top">superior izquierda</string>
+    <string name="zone_short_left_bottom">inferior izquierda</string>
+    <string name="zone_short_center_top">superior centro</string>
+    <string name="zone_short_center_bottom">inferior centro</string>
+    <string name="zone_short_right_top">superior derecha</string>
+    <string name="zone_short_right_bottom">inferior derecha</string>
 
     <!-- Settings (Spanish) -->
     <string name="settings_title">Configuración</string>

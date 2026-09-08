@@ -7,14 +7,20 @@ import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.SeekBar
+import androidx.core.os.LocaleListCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.navigation.fragment.findNavController
 import com.unimagdalena.assistivevision.R
 import com.unimagdalena.assistivevision.databinding.FragmentSettingsBinding
 import com.unimagdalena.assistivevision.viewmodel.SettingsViewModel
 import kotlinx.coroutines.launch
+import java.util.Locale
+import java.util.concurrent.atomic.AtomicInteger
 
 class SettingsFragment : Fragment() {
 
@@ -23,6 +29,16 @@ class SettingsFragment : Fragment() {
     private val viewModel: SettingsViewModel by viewModels()
 
     private var isInitializing = true
+
+    /** Language currently persisted; guards against redundant locale writes. */
+    private var currentLanguage = ""
+
+    /** Counts first emissions of every settings collector before user events count. */
+    private val initialSyncCount = AtomicInteger(0)
+
+    private fun markInitialSyncDone() {
+        if (initialSyncCount.incrementAndGet() >= 5) isInitializing = false
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -61,12 +77,11 @@ class SettingsFragment : Fragment() {
 
         binding.languageSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>, view: View?, pos: Int, id: Long) {
-                if (!isInitializing) {
-                    viewModel.setLanguage(languages[pos].second)
-                    androidx.appcompat.app.AppCompatDelegate.setApplicationLocales(
-                        androidx.core.os.LocaleListCompat.create(
-                            java.util.Locale.forLanguageTag(languages[pos].second)
-                        )
+                val lang = languages[pos].second
+                if (!isInitializing && lang != currentLanguage) {
+                    viewModel.setLanguage(lang)
+                    AppCompatDelegate.setApplicationLocales(
+                        LocaleListCompat.create(Locale.forLanguageTag(lang))
                     )
                 }
             }
@@ -112,6 +127,7 @@ class SettingsFragment : Fragment() {
                 btn.setTextColor(
                     if (isSelected) 0xFFFFFFFF.toInt() else 0x80FFFFFF.toInt()
                 )
+                btn.isSelected = isSelected
             }
             viewModel.setMaxObjects(max)
         }
@@ -129,48 +145,56 @@ class SettingsFragment : Fragment() {
 
     private fun observeSettings() {
         viewLifecycleOwner.lifecycleScope.launch {
-            isInitializing = true
-
-            viewModel.language.collect { lang ->
-                val pos = if (lang == "es") 0 else 1
-                binding.languageSpinner.setSelection(pos)
-            }
-        }
-
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.speechRate.collect { rate ->
-                val progress = ((rate - 0.5f) / 0.1f).toInt().coerceIn(0, 20)
-                binding.speechRateSeekBar.progress = progress
-                binding.speechRateValue.text = getString(R.string.settings_speech_rate_display, rate)
-                isInitializing = false
-            }
-        }
-
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.confidence.collect { conf ->
-                val progress = ((conf - 0.10f) / 0.01f).toInt().coerceIn(0, 80)
-                binding.confidenceSeekBar.progress = progress
-                binding.confidenceValue.text = getString(R.string.settings_confidence_display, conf)
-            }
-        }
-
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.maxObjects.collect { max ->
-                val btns = listOf(binding.btnMax1, binding.btnMax2, binding.btnMax3)
-                btns.forEachIndexed { index, btn ->
-                    val isSelected = index + 1 == max
-                    btn.setBackgroundResource(
-                        if (isSelected) R.drawable.toggle_selected_bg
-                        else R.drawable.toggle_bg
-                    )
-                    btn.setTextColor(if (isSelected) 0xFFFFFFFF.toInt() else 0x80FFFFFF.toInt())
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                launch {
+                    viewModel.language.collect { lang ->
+                        currentLanguage = lang
+                        val pos = if (lang == "es") 0 else 1
+                        binding.languageSpinner.setSelection(pos)
+                        markInitialSyncDone()
+                    }
                 }
-            }
-        }
 
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.showPreview.collect { show ->
-                binding.switchShowPreview.isChecked = show
+                launch {
+                    viewModel.speechRate.collect { rate ->
+                        val progress = ((rate - 0.5f) / 0.1f).toInt().coerceIn(0, 20)
+                        binding.speechRateSeekBar.progress = progress
+                        binding.speechRateValue.text = getString(R.string.settings_speech_rate_display, rate)
+                        markInitialSyncDone()
+                    }
+                }
+
+                launch {
+                    viewModel.confidence.collect { conf ->
+                        val progress = ((conf - 0.10f) / 0.01f).toInt().coerceIn(0, 80)
+                        binding.confidenceSeekBar.progress = progress
+                        binding.confidenceValue.text = getString(R.string.settings_confidence_display, conf)
+                        markInitialSyncDone()
+                    }
+                }
+
+                launch {
+                    viewModel.maxObjects.collect { max ->
+                        val btns = listOf(binding.btnMax1, binding.btnMax2, binding.btnMax3)
+                        btns.forEachIndexed { index, btn ->
+                            val isSelected = index + 1 == max
+                            btn.setBackgroundResource(
+                                if (isSelected) R.drawable.toggle_selected_bg
+                                else R.drawable.toggle_bg
+                            )
+                            btn.setTextColor(if (isSelected) 0xFFFFFFFF.toInt() else 0x80FFFFFF.toInt())
+                            btn.isSelected = isSelected
+                        }
+                        markInitialSyncDone()
+                    }
+                }
+
+                launch {
+                    viewModel.showPreview.collect { show ->
+                        binding.switchShowPreview.isChecked = show
+                        markInitialSyncDone()
+                    }
+                }
             }
         }
     }

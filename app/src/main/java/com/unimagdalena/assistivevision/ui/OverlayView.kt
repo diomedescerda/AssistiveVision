@@ -7,10 +7,16 @@ import android.graphics.Paint
 import android.graphics.RectF
 import android.graphics.Typeface
 import android.util.AttributeSet
+import android.util.TypedValue
 import android.view.View
 import com.unimagdalena.assistivevision.model.Detection
 
 class OverlayView(context: Context, attrs: AttributeSet?) : View(context, attrs) {
+
+    init {
+        // Purely visual; TalkBack reads detection results from the status row.
+        importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_NO
+    }
 
     private var detections: List<Detection> = emptyList()
     private var frameWidth = 0
@@ -25,15 +31,26 @@ class OverlayView(context: Context, attrs: AttributeSet?) : View(context, attrs)
         isAntiAlias = true
     }
 
+    /** Dark halo behind the box stroke so it stays visible on any scene. */
+    private val boxHaloPaint = Paint().apply {
+        style = Paint.Style.STROKE
+        color = 0xCC000000.toInt()
+        strokeWidth = 8f
+        isAntiAlias = true
+    }
+
+    /** Darker teal than the box so white tag text keeps 4.5:1 contrast. */
     private val tagPaint = Paint().apply {
         style = Paint.Style.FILL
-        color = boxColor
+        color = 0xFF14785E.toInt()
         isAntiAlias = true
     }
 
     private val textPaint = Paint().apply {
         color = Color.WHITE
-        textSize = 36f
+        textSize = TypedValue.applyDimension(
+            TypedValue.COMPLEX_UNIT_SP, 14f, resources.displayMetrics
+        )
         typeface = Typeface.DEFAULT_BOLD
         isAntiAlias = true
     }
@@ -72,6 +89,7 @@ class OverlayView(context: Context, attrs: AttributeSet?) : View(context, attrs)
             val bottom = d.bbox.bottom * viewScale + offsetY
 
             boxRect.set(left, top, right, bottom)
+            canvas.drawRoundRect(boxRect, boxCornerRadius, boxCornerRadius, boxHaloPaint)
             canvas.drawRoundRect(boxRect, boxCornerRadius, boxCornerRadius, boxPaint)
 
             val label = "${d.className} ${(d.score * 100).toInt()}%"

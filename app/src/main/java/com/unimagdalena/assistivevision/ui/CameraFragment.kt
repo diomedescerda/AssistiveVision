@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
@@ -24,11 +25,16 @@ class CameraFragment : Fragment() {
     private var captureModule: CaptureModule? = null
 
     private var isFullscreen = false
+    private var isCapturing = false
+    private var permissionDenied = false
 
     private val cameraPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { granted ->
-        if (granted) startCamera() else onPermissionDenied()
+        if (granted) {
+            permissionDenied = false
+            startCamera()
+        } else onPermissionDenied()
     }
 
     override fun onCreateView(
@@ -64,12 +70,36 @@ class CameraFragment : Fragment() {
     }
 
     private fun onPermissionDenied() {
+        permissionDenied = true
+        updateCaptureButton()
         binding.statusText.text = getString(R.string.camera_permission_denied)
-        binding.btnCapture.isEnabled = false
-        binding.btnCapture.alpha = 0.5f
+    }
+
+    /** Enables the capture button only when a capture is possible right now. */
+    private fun updateCaptureButton() {
+        val enabled = !permissionDenied && !isCapturing
+        binding.btnCapture.isEnabled = enabled
+        binding.btnCapture.alpha = if (enabled) 1f else 0.5f
+    }
+
+    /** The container buttons are LinearLayouts; give them a button role for TalkBack. */
+    private fun applyButtonRole(vararg views: View) {
+        views.forEach { view ->
+            view.accessibilityDelegate = object : View.AccessibilityDelegate() {
+                override fun onInitializeAccessibilityNodeInfo(
+                    host: View,
+                    info: android.view.accessibility.AccessibilityNodeInfo
+                ) {
+                    super.onInitializeAccessibilityNodeInfo(host, info)
+                    info.className = Button::class.java.name
+                }
+            }
+        }
     }
 
     private fun setupListeners() {
+        applyButtonRole(binding.btnCapture, binding.btnSettings)
+        updateCaptureButton()
 
         // Fullscreen toggle
         binding.btnFullscreen.setOnClickListener {
@@ -106,6 +136,10 @@ class CameraFragment : Fragment() {
         }
         viewModel.zoneLabel.observe(viewLifecycleOwner) { label ->
             binding.zoneLabel.text = label
+        }
+        viewModel.isCapturing.observe(viewLifecycleOwner) { capturing ->
+            isCapturing = capturing
+            updateCaptureButton()
         }
         viewModel.speechUnavailable.observe(viewLifecycleOwner) { unavailable ->
             if (unavailable) binding.statusText.text = getString(R.string.tts_unavailable)

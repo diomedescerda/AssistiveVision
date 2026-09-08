@@ -33,6 +33,15 @@
     <string name="action_settings">Settings</string>
     <string name="camera_permission_denied">Camera permission is required to detect objects</string>
     <string name="tts_unavailable">Voice output unavailable</string>
+    <string name="status_active_a11y">Active</string>
+
+    <!-- Short zone names for the on-screen label -->
+    <string name="zone_short_left_top">top left</string>
+    <string name="zone_short_left_bottom">bottom left</string>
+    <string name="zone_short_center_top">top center</string>
+    <string name="zone_short_center_bottom">bottom center</string>
+    <string name="zone_short_right_top">top right</string>
+    <string name="zone_short_right_bottom">bottom right</string>
 
     <!-- Settings (English) -->
     <string name="settings_title">Settings</string>

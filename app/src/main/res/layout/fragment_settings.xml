@@ -22,8 +22,8 @@
 
             <ImageButton
                 android:id="@+id/btnBack"
-                android:layout_width="46dp"
-                android:layout_height="46dp"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
                 android:background="@drawable/icon_button_bg"
                 android:src="@drawable/ic_back"
                 android:contentDescription="@string/settings_back"
@@ -44,7 +44,7 @@
                 android:src="@drawable/ic_app_icon"
                 android:background="@drawable/icon_teal_bg"
                 android:padding="7dp"
-                android:contentDescription="@string/app_icon" />
+                android:importantForAccessibility="no" />
 
         </LinearLayout>
 
@@ -94,14 +94,16 @@
                     android:src="@drawable/ic_language"
                     android:background="@drawable/icon_chip_bg"
                     android:padding="8dp"
-                    android:contentDescription="@string/settings_language"
+                    android:importantForAccessibility="no"
                     android:layout_marginEnd="12dp" />
 
                 <TextView
+                    android:id="@+id/languageLabel"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="@string/settings_language"
+                    android:labelFor="@+id/languageSpinner"
                     android:textColor="#FFFFFF"
                     android:textSize="16sp"
                     android:textStyle="bold" />
@@ -150,14 +152,16 @@
                     android:src="@drawable/ic_volume"
                     android:background="@drawable/icon_chip_bg"
                     android:padding="8dp"
-                    android:contentDescription="@string/settings_speech_rate"
+                    android:importantForAccessibility="no"
                     android:layout_marginEnd="12dp" />
 
                 <TextView
+                    android:id="@+id/speechRateLabel"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="@string/settings_speech_rate"
+                    android:labelFor="@+id/speechRateSeekBar"
                     android:textColor="#FFFFFF"
                     android:textSize="16sp"
                     android:textStyle="bold" />
@@ -167,7 +171,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/settings_speech_rate_value"
-                    android:textColor="#1D9E75"
+                    android:textColor="#5DCAA5"
                     android:textSize="13sp"
                     android:textStyle="bold"
                     android:background="@drawable/value_pill_bg"
@@ -203,9 +207,9 @@
                 android:layout_marginStart="48dp">
                 <TextView android:layout_width="0dp" android:layout_height="wrap_content"
                     android:layout_weight="1" android:text="@string/settings_speech_rate_min"
-                    android:textColor="#66FFFFFF" android:textSize="11sp" />
+                    android:textColor="#B3FFFFFF" android:textSize="11sp" />
                 <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                    android:text="@string/settings_speech_rate_max" android:textColor="#66FFFFFF" android:textSize="11sp" />
+                    android:text="@string/settings_speech_rate_max" android:textColor="#B3FFFFFF" android:textSize="11sp" />
             </LinearLayout>
 
         </LinearLayout>
@@ -257,14 +261,16 @@
                     android:src="@drawable/ic_target"
                     android:background="@drawable/icon_chip_bg"
                     android:padding="8dp"
-                    android:contentDescription="@string/settings_confidence"
+                    android:importantForAccessibility="no"
                     android:layout_marginEnd="12dp" />
 
                 <TextView
+                    android:id="@+id/confidenceLabel"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="@string/settings_confidence"
+                    android:labelFor="@+id/confidenceSeekBar"
                     android:textColor="#FFFFFF"
                     android:textSize="16sp"
                     android:textStyle="bold" />
@@ -274,7 +280,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/settings_confidence_value"
-                    android:textColor="#1D9E75"
+                    android:textColor="#5DCAA5"
                     android:textSize="13sp"
                     android:textStyle="bold"
                     android:background="@drawable/value_pill_bg"
@@ -310,9 +316,9 @@
                 android:layout_marginStart="48dp">
                 <TextView android:layout_width="0dp" android:layout_height="wrap_content"
                     android:layout_weight="1" android:text="@string/settings_confidence_min"
-                    android:textColor="#66FFFFFF" android:textSize="11sp" />
+                    android:textColor="#B3FFFFFF" android:textSize="11sp" />
                 <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                    android:text="@string/settings_confidence_max" android:textColor="#66FFFFFF" android:textSize="11sp" />
+                    android:text="@string/settings_confidence_max" android:textColor="#B3FFFFFF" android:textSize="11sp" />
             </LinearLayout>
 
         </LinearLayout>
@@ -338,14 +344,16 @@
                     android:src="@drawable/ic_objects"
                     android:background="@drawable/icon_chip_bg"
                     android:padding="8dp"
-                    android:contentDescription="@string/settings_max_objects"
+                    android:importantForAccessibility="no"
                     android:layout_marginEnd="12dp" />
 
                 <TextView
+                    android:id="@+id/maxObjectsLabel"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="@string/settings_max_objects"
+                    android:labelFor="@+id/maxObjectsGroup"
                     android:textColor="#FFFFFF"
                     android:textSize="16sp"
                     android:textStyle="bold" />
@@ -461,7 +469,7 @@
                     android:src="@drawable/ic_eye"
                     android:background="@drawable/icon_chip_bg"
                     android:padding="8dp"
-                    android:contentDescription="@string/settings_show_preview"
+                    android:importantForAccessibility="no"
                     android:layout_marginEnd="12dp" />
 
                 <LinearLayout
@@ -471,9 +479,11 @@
                     android:orientation="vertical">
 
                     <TextView
+                        android:id="@+id/showPreviewLabel"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/settings_show_preview"
+                        android:labelFor="@+id/switchShowPreview"
                         android:textColor="#FFFFFF"
                         android:textSize="16sp"
                         android:textStyle="bold" />

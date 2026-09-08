@@ -142,7 +142,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
                 if (localized.isNotEmpty()) {
                     val top = localized.first()
-                    _zoneLabel.postValue("${top.className} · ${top.zone}")
+                    _zoneLabel.postValue(
+                        "${LocalizedLabels.classLabel(appContext, top.classId)} · " +
+                            LocalizedLabels.zoneShortLabel(appContext, top.zone)
+                    )
                     val started = audioModule.speak(buildUtterance(localized))
                     if (started) armWatchdog() else unfreeze()
                 } else {
