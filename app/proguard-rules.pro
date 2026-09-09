@@ -11,3 +11,7 @@
 # methods by name through JNI.
 -keep class com.k2fsa.sherpa.onnx.** { *; }
 -dontwarn com.k2fsa.sherpa.onnx.**
+
+# Streaming speech callback: sherpa's JNI looks up invoke([F)Ljava/lang/Integer;
+# on the callback object; keep the adapter and its exact method signature.
+-keep class com.unimagdalena.assistivevision.modules.TtsSampleCallback { *; }

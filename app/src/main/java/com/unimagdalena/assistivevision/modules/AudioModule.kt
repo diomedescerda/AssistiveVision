@@ -95,8 +95,6 @@ class AudioModule(context: Context) {
         executor.execute {
             try {
                 ensureVoice(language)
-                ready = true
-                postReady()
             } catch (t: Throwable) {
                 Log.e(TAG, "Offline TTS init failed", t)
                 failed = true
@@ -113,9 +111,7 @@ class AudioModule(context: Context) {
             executor.execute {
                 try {
                     ensureVoice(language)
-                    ready = true
                     failed = false
-                    postReady()
                 } catch (t: Throwable) {
                     Log.e(TAG, "Offline TTS init retry failed", t)
                     failed = true
@@ -190,9 +186,6 @@ class AudioModule(context: Context) {
         var completed = false
         try {
             val engine = ensureVoice(language)
-            ready = true
-            readyLanguage = language
-            postReady()
 
             val newTrack = createTrack(engine.sampleRate())
             if (newTrack == null) {
@@ -207,23 +200,33 @@ class AudioModule(context: Context) {
 
             var writeFailed = false
             val started = SystemClock.elapsedRealtime()
+            // Wrapped in a named Java class: sherpa's JNI resolves the callback
+            // as invoke([F)Ljava/lang/Integer;, a signature D8 strips from
+            // desugared Kotlin lambdas (crashes with NoSuchMethodError).
+            val sampleHandler: (FloatArray) -> Int = { samples ->
+                if (utterance.aborted.get()) {
+                    0
+                } else {
+                    val t = track
+                    if (t == null || t.playState != AudioTrack.PLAYSTATE_PLAYING) {
+                        0
+                    } else {
+                        val written = t.write(samples, 0, samples.size, AudioTrack.WRITE_BLOCKING)
+                        if (written < 0 || written < samples.size) {
+                            Log.e(TAG, "AudioTrack write failed ($written of ${samples.size} samples)")
+                            writeFailed = true
+                            0
+                        } else {
+                            if (utterance.aborted.get()) 0 else 1
+                        }
+                    }
+                }
+            }
             val audio = engine.generateWithCallback(
                 text = text,
                 speed = speechRate,
-            ) { samples ->
-                if (utterance.aborted.get()) return@generateWithCallback 0
-                val t = track
-                if (t == null || t.playState != AudioTrack.PLAYSTATE_PLAYING) {
-                    return@generateWithCallback 0
-                }
-                val written = t.write(samples, 0, samples.size, AudioTrack.WRITE_BLOCKING)
-                if (written < 0 || written < samples.size) {
-                    Log.e(TAG, "AudioTrack write failed ($written of ${samples.size} samples)")
-                    writeFailed = true
-                    return@generateWithCallback 0
-                }
-                if (utterance.aborted.get()) 0 else 1
-            }
+                callback = TtsSampleCallback(sampleHandler),
+            )
             Log.i(
                 TAG,
                 "Generated ${audio.samples.size} samples in " +
@@ -300,11 +303,15 @@ class AudioModule(context: Context) {
         val engine = OfflineTts(assetManager = appContext.assets, config = config)
         tts = engine
         readyLanguage = languageTag
+        ready = true
         Log.i(
             TAG,
             "Voice '${spec.assetDir}' ready in ${SystemClock.elapsedRealtime() - started} ms, " +
                 "sampleRate=${engine.sampleRate()}"
         )
+        // onReady fires exactly once per engine creation (cold start or voice
+        // switch), never per utterance.
+        postReady()
         return engine
     }
 
