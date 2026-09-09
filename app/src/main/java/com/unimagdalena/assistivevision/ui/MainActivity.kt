@@ -1,24 +1,31 @@
 package com.unimagdalena.assistivevision.ui
 
 import android.os.Bundle
+import android.view.KeyEvent
 import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.activity.SystemBarStyle
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
 import androidx.core.os.LocaleListCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.NavHostFragment
+import com.unimagdalena.assistivevision.R
 import com.unimagdalena.assistivevision.data.SettingsManager
 import com.unimagdalena.assistivevision.databinding.ActivityMainBinding
+import com.unimagdalena.assistivevision.model.ShutterKeyPolicy
+import com.unimagdalena.assistivevision.viewmodel.MainViewModel
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import java.util.Locale
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
+    private val mainViewModel: MainViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge(
@@ -38,6 +45,29 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         applySavedLocale()
+    }
+
+    /**
+     * Bluetooth shutter remotes (e.g. the button on a GorillaPod grip) pair as
+     * HID keyboards and send volume/camera keycodes; on the camera screen they
+     * trigger capture instead of their default behavior.
+     */
+    override fun dispatchKeyEvent(event: KeyEvent): Boolean {
+        if (event.action == KeyEvent.ACTION_DOWN &&
+            event.repeatCount == 0 &&
+            ShutterKeyPolicy.isShutterKey(event.keyCode) &&
+            isOnCameraScreen()
+        ) {
+            mainViewModel.captureFrame()
+            return true
+        }
+        return super.dispatchKeyEvent(event)
+    }
+
+    private fun isOnCameraScreen(): Boolean {
+        val navHost = supportFragmentManager
+            .findFragmentById(R.id.nav_host_fragment) as? NavHostFragment
+        return navHost?.navController?.currentDestination?.id == R.id.cameraFragment
     }
 
     /**

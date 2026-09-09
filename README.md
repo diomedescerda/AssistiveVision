@@ -9,6 +9,7 @@ AssistiveVision leverages on-device machine learning to help visually impaired i
 ## Features
 
 - **Manual capture workflow** — tap "Capture" to freeze the current frame; one tap, one clear announcement
+- **Remote shutter support** — a paired Bluetooth camera remote (e.g. a GorillaPod grip button) triggers capture; no extra permissions, works fully offline
 - **Fully offline** — no INTERNET permission; detection and speech synthesis both run on-device from bundled assets
 - **Object detection** using the EfficientDet-Lite2 TFLite model (LiteRT)
 - **Smart lens selection** — binds the 0.5x ultra-wide camera when the phone has one, otherwise the lowest-focal-length (1x) back camera
@@ -158,6 +159,7 @@ app/src/main/java/com/unimagdalena/assistivevision/
 1. Grant camera permission when prompted (denial is explained in-app; re-request happens on next launch of the screen)
 2. Point the camera at an object and tap **Capture** — the frame freezes, the most confident object is announced (e.g. "silla, inferior izquierda"), and boxes are drawn over the frozen frame
 3. Open **Settings** to change the language, speech rate, confidence threshold, maximum announced objects, or preview visibility
+4. **Hands-free capture**: pair a Bluetooth camera remote (GorillaPod-style grip button) in Android Bluetooth settings — on the camera screen its button (volume up/down, camera, headset, or enter keycode, depending on the model) triggers capture exactly like the on-screen button
 
 ### Release signing
 

@@ -52,6 +52,8 @@ MainViewModel pipeline (manual capture only):
 | Module | Responsibility | Key facts |
 |--------|----------------|-----------|
 | `CaptureModule` | CameraX preview + ImageAnalysis | RGBA_8888, `STRATEGY_KEEP_ONLY_LATEST`, ≤ 9 FPS throttle, rotation applied, `imageProxy.close()` in `finally`, per-view executor |
+
+Remote shutter input: `MainActivity.dispatchKeyEvent` maps volume/camera/headset/enter keycodes (`ShutterKeyPolicy`) to `MainViewModel.captureFrame()` while the camera destination is active — Bluetooth remotes pair at the OS level, no extra permission or connectivity code.
 | `CameraLensPolicy` | Pure lens decision | Lowest focal length among back cameras (0.5× ultra-wide preferred); pure & unit-tested |
 | `PreprocessingModule` | Letterbox + tensor packing | 448×448, gray-114 padding, RGB uint8 `ByteBuffer` (allocateDirect), geometry from `LetterboxMapper`; caller-serialized via `pipelineMutex` |
 | `LetterboxMapper` | Pure geometry | Forward `Geometry(scale, dx, dy, dstW, dstH)` + exact inverse `toFrameX/Y`; floored forward / exact float inverse; round-trip tested |
