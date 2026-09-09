@@ -159,9 +159,13 @@ upgrade). Speech is synthesized locally through JNI and streamed to an
 and no platform-TTS fallback**: if the bundled engine or voice fails to initialize,
 the UI reports "voice unavailable" and the app degrades visibly (FR-13).
 
-Audio descriptor grammar (what is spoken): `"<object>, <zone>"` for one object;
-`"<obj1>, <zone1>; <obj2>, <zone2>; …"` up to `maxObjects` — e.g.
-`"silla, inferior izquierda"`. Full spec in `docs/ARCHITECTURE.md` §7.
+Audio descriptor grammar (what is spoken): natural sentences with connectors and
+articles, e.g. `"Hay una persona donde estás apuntando, también hay una silla
+abajo a la izquierda de donde estás apuntando y una computadora arriba a la
+derecha de donde estás apuntando."` (English: `"There is a person where you're
+pointing, there is also a chair to the lower left of where you're pointing and a
+computer to the upper right of where you're pointing."`), up to `maxObjects`
+items. Full spec in `docs/ARCHITECTURE.md` §8.
 
 ---
 
@@ -204,4 +208,4 @@ walking while distracted; the final report must state this explicitly.
 | Requirements & conceptual design | §1–§3, §7–§9 |
 | DNN selection/evaluation | §5 |
 | Priority-object definition + datasets (COCO / Open Images) | §4 |
-| Audio descriptor design | §6 + `docs/ARCHITECTURE.md` §7 |
+| Audio descriptor design | §6 + `docs/ARCHITECTURE.md` §8 |

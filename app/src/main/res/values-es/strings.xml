@@ -13,6 +13,21 @@
     <string name="class_sink">lavabo</string>
     <string name="class_refrigerator">refrigerador</string>
 
+    <!-- Voz natural (español): nombres con artículo y conectores de frase -->
+    <string name="speech_class_person">una persona</string>
+    <string name="speech_class_chair">una silla</string>
+    <string name="speech_class_couch">un sofá</string>
+    <string name="speech_class_bed">una cama</string>
+    <string name="speech_class_table">una mesa</string>
+    <string name="speech_class_toilet">un inodoro</string>
+    <string name="speech_class_tv">un televisor</string>
+    <string name="speech_class_computer">una computadora</string>
+    <string name="speech_class_sink">un lavabo</string>
+    <string name="speech_class_refrigerator">un refrigerador</string>
+    <string name="speech_there_is">Hay</string>
+    <string name="speech_also_there_is">también hay</string>
+    <string name="speech_and">y</string>
+
     <!-- Zone labels (Spanish) -->
     <string name="zone_left_top">arriba a la izquierda de donde estás apuntando</string>
     <string name="zone_left_bottom">abajo a la izquierda de donde estás apuntando</string>

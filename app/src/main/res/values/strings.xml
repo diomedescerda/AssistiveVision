@@ -13,6 +13,21 @@
     <string name="class_sink">sink</string>
     <string name="class_refrigerator">refrigerator</string>
 
+    <!-- Natural speech (English): object names with article + sentence connectors -->
+    <string name="speech_class_person">a person</string>
+    <string name="speech_class_chair">a chair</string>
+    <string name="speech_class_couch">a couch</string>
+    <string name="speech_class_bed">a bed</string>
+    <string name="speech_class_table">a table</string>
+    <string name="speech_class_toilet">a toilet</string>
+    <string name="speech_class_tv">a television</string>
+    <string name="speech_class_computer">a computer</string>
+    <string name="speech_class_sink">a sink</string>
+    <string name="speech_class_refrigerator">a refrigerator</string>
+    <string name="speech_there_is">There is</string>
+    <string name="speech_also_there_is">there is also</string>
+    <string name="speech_and">and</string>
+
     <!-- Zone labels (English) -->
     <string name="zone_left_top">to the upper left of where you\'re pointing</string>
     <string name="zone_left_bottom">to the lower left of where you\'re pointing</string>

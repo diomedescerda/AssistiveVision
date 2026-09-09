@@ -165,13 +165,17 @@ factor (DataStore default 1.0; UI exposes 0.5–2.5).
 
 ## 8. Audio descriptor grammar (proposal: "audio descriptor module")
 
+Natural sentences with connectors (localized EN/ES in `speech_*` string resources;
+assembly in `SpeechFormatter.announce`):
+
 | Situation | Spoken output |
 |-----------|---------------|
-| One object | `"<name>, <zone>"` → `"silla, inferior izquierda"` / `"chair, lower left"` |
-| 2–3 objects | `"<n1>, <z1>; <n2>, <z2>; …"` ordered by confidence (cap = `maxObjects`) |
+| One object | ES: `"Hay una persona donde estás apuntando."` / EN: `"There is a person where you're pointing."` |
+| 2 objects | ES: `"Hay una persona donde estás apuntando y una silla a la izquierda de donde estás apuntando."` |
+| 3+ objects | ES: `"Hay …, también hay una silla abajo a la izquierda de donde estás apuntando y una computadora arriba a la derecha de donde estás apuntando."` — middle items repeat `también hay`, last joins with `y` |
 | Nothing detected | No speech; UI shows 0 objects and unfreezes immediately |
-| Zone vocabulary (EN) | `top/bottom` × `left/center/right` (6 zones) |
-| Zone vocabulary (ES) | `superior/inferior` × `izquierda/centro/derecha` |
+| Grammar | Each item = article + noun (`speech_class_*`, e.g. `una silla` / `a chair`) + zone phrase (`zone_*`, relative to "where you're pointing") |
+| Order / cap | Confidence ranking, top-`maxObjects` (1–3) |
 | Rate | User-configured 0.5×–2.5× (synthesis speed clamped 0.1–3.0) |
 
 Prioritization = confidence ranking (top-`maxObjects`); repetition = none needed

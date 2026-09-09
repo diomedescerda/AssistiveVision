@@ -200,10 +200,16 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     private fun buildUtterance(localized: List<Detection>): String {
         val spoken = localized.map { detection ->
-            LocalizedLabels.classLabel(appContext, detection.classId) to
+            LocalizedLabels.classWithArticle(appContext, detection.classId) to
                 LocalizedLabels.zoneLabel(appContext, detection.zone)
         }
-        return SpeechFormatter.announce(spoken)
+        val connectors = LocalizedLabels.speechConnectors(appContext)
+        return SpeechFormatter.announce(
+            spoken,
+            connectors.thereIs,
+            connectors.alsoThereIs,
+            connectors.and,
+        )
     }
 
     override fun onCleared() {

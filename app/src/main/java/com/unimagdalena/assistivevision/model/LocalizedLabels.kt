@@ -30,6 +30,37 @@ object LocalizedLabels {
     }
 
     /**
+     * Returns the localized name for a COCO class id used by the detector,
+     * with the natural-speech article ("una persona", "a chair").
+     */
+    fun classWithArticle(context: Context, classId: Int): String = when (classId) {
+        1 -> context.getString(R.string.speech_class_person)
+        62 -> context.getString(R.string.speech_class_chair)
+        63 -> context.getString(R.string.speech_class_couch)
+        65 -> context.getString(R.string.speech_class_bed)
+        67 -> context.getString(R.string.speech_class_table)
+        70 -> context.getString(R.string.speech_class_toilet)
+        72 -> context.getString(R.string.speech_class_tv)
+        73 -> context.getString(R.string.speech_class_computer)
+        81 -> context.getString(R.string.speech_class_sink)
+        82 -> context.getString(R.string.speech_class_refrigerator)
+        else -> context.getString(R.string.speech_class_person)
+    }
+
+    /** Localized sentence connectors used by [SpeechFormatter.announce]. */
+    data class SpeechConnectors(
+        val thereIs: String,
+        val alsoThereIs: String,
+        val and: String,
+    )
+
+    fun speechConnectors(context: Context) = SpeechConnectors(
+        thereIs = context.getString(R.string.speech_there_is),
+        alsoThereIs = context.getString(R.string.speech_also_there_is),
+        and = context.getString(R.string.speech_and),
+    )
+
+    /**
      * Returns the localized label for a spatial zone string produced by
      * [com.unimagdalena.assistivevision.modules.LocalizationModule].
      */

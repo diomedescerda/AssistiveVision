@@ -17,7 +17,7 @@ AssistiveVision leverages on-device machine learning to help visually impaired i
 - **10 target object classes**: person, chair, couch, bed, table, toilet, tv, computer, sink, refrigerator
 - **Detection overlay** with teal bounding boxes, a dark visibility halo, and label tags (font-scale aware)
 - **Spatial localization** — zones like "bottom center", "top left", etc.
-- **Spoken announcements** — bundled offline TTS (sherpa-onnx + Piper VITS voices) reports detected objects with localized names and zones (e.g. "silla, inferior izquierda"), in Spanish (default) and English; no platform TTS and no network involved
+- **Spoken announcements** — bundled offline TTS (sherpa-onnx + Piper VITS voices) reports detected objects as natural sentences with localized names, zones and connectors (e.g. "Hay una persona donde estás apuntando, también hay una silla abajo a la izquierda de donde estás apuntando y una computadora arriba a la derecha de donde estás apuntando."), in Spanish (default) and English; no platform TTS and no network involved
 - **Settings** — language, speech rate (0.5x–2.5x), confidence threshold (0.10–0.90), max announced objects (1–3), preview visibility
 - **Per-app language switching** — instant EN/ES switch via `AppCompatDelegate` with platform `localeConfig`
 - **Accessibility** — WCAG-AA contrast, button roles and labels for TalkBack, live-region status row
@@ -157,7 +157,7 @@ app/src/main/java/com/unimagdalena/assistivevision/
 ### Usage
 
 1. Grant camera permission when prompted (denial is explained in-app; re-request happens on next launch of the screen)
-2. Point the camera at an object and tap **Capture** — the frame freezes, the most confident object is announced (e.g. "silla, inferior izquierda"), and boxes are drawn over the frozen frame
+2. Point the camera at an object and tap **Capture** — the frame freezes and the result is announced as a natural sentence (e.g. "Hay una persona donde estás apuntando y una silla abajo a la izquierda de donde estás apuntando."), with boxes drawn over the frozen frame
 3. Open **Settings** to change the language, speech rate, confidence threshold, maximum announced objects, or preview visibility
 4. **Hands-free capture**: pair a Bluetooth camera remote (GorillaPod-style grip button) in Android Bluetooth settings — on the camera screen its button (volume up/down, camera, headset, or enter keycode, depending on the model) triggers capture exactly like the on-screen button
 

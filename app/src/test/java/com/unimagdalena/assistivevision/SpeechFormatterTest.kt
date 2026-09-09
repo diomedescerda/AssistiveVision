@@ -6,49 +6,81 @@ import org.junit.Test
 
 class SpeechFormatterTest {
 
+    private val thereIs = "Hay"
+    private val alsoThereIs = "también hay"
+    private val and = "y"
+
     @Test
-    fun single_detection_yields_name_zone() {
-        assertEquals("silla, frente a ti", SpeechFormatter.announce("silla", "frente a ti"))
+    fun single_object_builds_one_natural_sentence() {
+        val items = listOf("una persona" to "donde estás apuntando")
+        assertEquals(
+            "Hay una persona donde estás apuntando.",
+            SpeechFormatter.announce(items, thereIs, alsoThereIs, and)
+        )
     }
 
     @Test
-    fun multiple_detections_are_joined_with_semicolon() {
+    fun two_objects_join_with_and() {
         val items = listOf(
-            "persona" to "a la derecha",
-            "cama" to "abajo a la izquierda"
+            "una persona" to "donde estás apuntando",
+            "una silla" to "a la izquierda de donde estás apuntando"
         )
         assertEquals(
-            "persona, a la derecha; cama, abajo a la izquierda",
-            SpeechFormatter.announce(items)
+            "Hay una persona donde estás apuntando y una silla a la izquierda de donde estás apuntando.",
+            SpeechFormatter.announce(items, thereIs, alsoThereIs, and)
+        )
+    }
+
+    @Test
+    fun three_objects_use_also_and_and() {
+        val items = listOf(
+            "una persona" to "donde estás apuntando",
+            "una silla" to "a la izquierda de donde estás apuntando",
+            "una computadora" to "arriba a la derecha de donde estás apuntando"
+        )
+        assertEquals(
+            "Hay una persona donde estás apuntando, también hay una silla a la izquierda de donde estás apuntando y una computadora arriba a la derecha de donde estás apuntando.",
+            SpeechFormatter.announce(items, thereIs, alsoThereIs, and)
+        )
+    }
+
+    @Test
+    fun four_objects_repeat_also_for_middle_items() {
+        val items = listOf(
+            "una persona" to "donde estás apuntando",
+            "una silla" to "a la izquierda de donde estás apuntando",
+            "una cama" to "a la derecha de donde estás apuntando",
+            "una mesa" to "arriba de donde estás apuntando"
+        )
+        assertEquals(
+            "Hay una persona donde estás apuntando, también hay una silla a la izquierda de donde estás apuntando, también hay una cama a la derecha de donde estás apuntando y una mesa arriba de donde estás apuntando.",
+            SpeechFormatter.announce(items, thereIs, alsoThereIs, and)
         )
     }
 
     @Test
     fun empty_list_yields_empty_utterance() {
-        assertEquals("", SpeechFormatter.announce(emptyList()))
+        assertEquals("", SpeechFormatter.announce(emptyList(), thereIs, alsoThereIs, and))
     }
 
     @Test
-    fun single_item_list_matches_single_form() {
-        val items = listOf("mesa" to "al centro")
-        assertEquals("mesa, al centro", SpeechFormatter.announce(items))
-    }
-
-    @Test
-    fun three_or_more_items_keep_declaration_order() {
-        val items = listOf(
-            "persona" to "a la derecha",
-            "silla" to "frente a ti",
-            "cama" to "abajo a la izquierda"
-        )
+    fun blank_zone_omits_the_zone_phrase() {
+        assertEquals("Hay una silla.", SpeechFormatter.announce(listOf("una silla" to ""), thereIs, alsoThereIs, and))
         assertEquals(
-            "persona, a la derecha; silla, frente a ti; cama, abajo a la izquierda",
-            SpeechFormatter.announce(items)
+            "Hay una persona donde estás apuntando y una silla.",
+            SpeechFormatter.announce(
+                listOf("una persona" to "donde estás apuntando", "una silla" to ""),
+                thereIs, alsoThereIs, and
+            )
         )
     }
 
     @Test
-    fun blank_zone_is_passed_through_untouched() {
-        assertEquals("silla, ", SpeechFormatter.announce("silla", ""))
+    fun capitalizes_the_first_letter_even_with_lowercase_connectors() {
+        val items = listOf("una persona" to "donde estás apuntando")
+        assertEquals(
+            "Hay una persona donde estás apuntando.",
+            SpeechFormatter.announce(items, "hay", alsoThereIs, and)
+        )
     }
 }
