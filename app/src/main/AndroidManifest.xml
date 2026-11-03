@@ -19,7 +19,8 @@
         android:theme="@style/Theme.AssistiveVision">
         <activity
             android:name="com.unimagdalena.assistivevision.ui.MainActivity"
-            android:exported="true">
+            android:exported="true"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

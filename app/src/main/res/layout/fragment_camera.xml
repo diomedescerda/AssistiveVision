@@ -9,11 +9,11 @@
     android:background="#111111">
 
     <!-- Camera preview -->
-    <androidx.camera.view.PreviewView
+    <TextureView
         android:id="@+id/previewView"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        app:scaleType="fitCenter"
+        app:layout_constraintDimensionRatio="9:16"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -26,10 +26,10 @@
         android:layout_height="0dp"
         android:visibility="gone"
         android:scaleType="fitCenter"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintTop_toTopOf="@id/previewView"
+        app:layout_constraintBottom_toBottomOf="@id/previewView"
+        app:layout_constraintStart_toStartOf="@id/previewView"
+        app:layout_constraintEnd_toEndOf="@id/previewView" />
 
     <!-- Detection overlay -->
     <com.unimagdalena.assistivevision.ui.OverlayView
@@ -180,8 +180,7 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:baselineAligned="false"
-            android:gravity="center"
-            android:weightSum="3">
+            android:gravity="center">
 
             <LinearLayout
                 android:id="@+id/btnCapture"

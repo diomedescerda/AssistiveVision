@@ -7,7 +7,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.activity.SystemBarStyle
 import androidx.activity.enableEdgeToEdge
-import androidx.activity.viewModels
 import androidx.core.os.LocaleListCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
@@ -18,14 +17,12 @@ import com.unimagdalena.assistivevision.R
 import com.unimagdalena.assistivevision.data.SettingsManager
 import com.unimagdalena.assistivevision.databinding.ActivityMainBinding
 import com.unimagdalena.assistivevision.model.ShutterKeyPolicy
-import com.unimagdalena.assistivevision.viewmodel.MainViewModel
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import java.util.Locale
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
-    private val mainViewModel: MainViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge(
@@ -58,10 +55,18 @@ class MainActivity : AppCompatActivity() {
             ShutterKeyPolicy.isShutterKey(event.keyCode) &&
             isOnCameraScreen()
         ) {
-            mainViewModel.captureFrame()
+            cameraFragment()?.capture()
             return true
         }
         return super.dispatchKeyEvent(event)
+    }
+
+    private fun cameraFragment(): CameraFragment? {
+        val navHost = supportFragmentManager
+            .findFragmentById(R.id.nav_host_fragment) as? NavHostFragment ?: return null
+        return navHost.childFragmentManager.fragments
+            .filterIsInstance<CameraFragment>()
+            .firstOrNull()
     }
 
     private fun isOnCameraScreen(): Boolean {

@@ -66,11 +66,22 @@ class CameraFragment : Fragment() {
     ) == PackageManager.PERMISSION_GRANTED
 
     private fun startCamera() {
-        val module = CaptureModule(requireContext(), viewLifecycleOwner) { bitmap ->
-            viewModel.processFrame(bitmap)
-        }
+        val module = CaptureModule(requireContext(), viewLifecycleOwner)
         captureModule = module
         module.start(binding.previewView)
+    }
+
+    /**
+     * Captures a JPEG still from the active (0.5x) camera, then runs the
+     * detection pipeline on it. Used by the on-screen button and the
+     * Bluetooth shutter.
+     */
+    fun capture() {
+        if (isCapturing || viewModel.frozenFrame.value != null) return
+        captureModule?.captureStill { bitmap ->
+            viewModel.processFrame(bitmap)
+            viewModel.captureFrame()
+        }
     }
 
     private fun onPermissionDenied() {
@@ -117,9 +128,9 @@ class CameraFragment : Fragment() {
             )
         }
 
-        // Take photo (runs detection on the latest frame)
+        // Capture a still and run detection on it
         binding.btnCapture.setOnClickListener {
-            viewModel.captureFrame()
+            capture()
         }
 
         // Settings

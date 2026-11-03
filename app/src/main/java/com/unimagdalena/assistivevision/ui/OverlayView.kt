@@ -77,7 +77,8 @@ class OverlayView(context: Context, attrs: AttributeSet?) : View(context, attrs)
 
         if (detections.isEmpty() || frameWidth <= 0 || frameHeight <= 0) return
 
-        // Fit the captured frame inside this view with a uniform scale
+        // Fit the captured frame inside this view with a uniform scale,
+        // matching the camera preview's fitCenter scaling.
         val viewScale = minOf(width.toFloat() / frameWidth, height.toFloat() / frameHeight)
         val offsetX = (width - frameWidth * viewScale) / 2f
         val offsetY = (height - frameHeight * viewScale) / 2f
