@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "date": "2026-11-05",
+  "purpose": "Intermediate development material relocated without deleting its contents",
+  "files": {
+    "docs/validation/apk-signature.txt": {
+      "destination": "development/validation/apk-signature.txt",
+      "sha256": "518f0a632993fb32d59e7f3dd701ca81b42a8a14bbddb07193b86d8bef2de324",
+      "bytes": 955,
+      "tracked_before": false,
+      "category": "verification records"
+    },
+    "docs/validation/build-checks.json": {
+      "destination": "development/validation/build-checks.json",
+      "sha256": "23118d40169ecc4ca3a57ae6ad59eb951f91acad91baac29c8a96cd18eac6524",
+      "bytes": 972,
+      "tracked_before": false,
+      "category": "verification records"
+    },
+    "docs/validation/clean-build.log": {
+      "destination": "development/validation/clean-build.log",
+      "sha256": "8230e0b4baef61d0934387f9917bce2d177248e400606794bb2e96b40a3063f2",
+      "bytes": 5803,
+      "tracked_before": false,
+      "category": "verification records"
+    },
+    "docs/validation/offline-instrumentation.log": {
+      "destination": "development/validation/offline-instrumentation.log",
+      "sha256": "1941ace55cc6a9f3a68b8c939cac5262ad4c5e4667e8ed0cbc64ff0197a549c3",
+      "bytes": 3601,
+      "tracked_before": false,
+      "category": "verification records"
+    },
+    "generate_voice_feedback_slides.py": {
+      "destination": "development/presentations/generate_voice_feedback_slides.py",
+      "sha256": "13ef1f73462e1f79fd195408ab1f0e2f4741ef375deeecfca2d012284acc09d3",
+      "bytes": 13299,
+      "tracked_before": true,
+      "category": "presentation tooling"
+    }
+  }
+}

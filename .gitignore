@@ -19,3 +19,10 @@ keystore.properties
 *.jks
 *.keystore
 *.keystore.id
+/dist/
+__pycache__/
+*.pyc
+
+# Generated intermediate work is kept out of the scientific/source delivery.
+/development/runs/
+/development/scratch/

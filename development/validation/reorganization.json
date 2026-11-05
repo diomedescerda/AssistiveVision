@@ -1,0 +1,13 @@
+{
+  "date": "2026-11-05",
+  "relocations": 5,
+  "assets_verified": 362,
+  "gradle_tasks": [
+    ":app:testDebugUnitTest",
+    ":app:assembleDebug"
+  ],
+  "result": "BUILD SUCCESSFUL; 45 tasks up-to-date",
+  "log": "reorganization-build.log",
+  "scope": "Documentation and auxiliary-file paths; app sources and assets unchanged",
+  "instrumentation_rerun": false
+}
