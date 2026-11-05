@@ -1,5 +1,8 @@
 # AssistiveVision — Requirements & Conceptual Design (Proposal Phase 1)
 
+The main application branch is **`main`**; use its source and
+[build guide](REPRODUCING.md) for the current implementation.
+
 This document supplies the measurable requirements, safety boundaries, privacy policy,
 target-user definition, object-class mapping, model-selection evidence, offline-TTS
 decision, and risk/ethics planning required by Phase 1 of the project proposal

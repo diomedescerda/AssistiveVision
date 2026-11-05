@@ -1,5 +1,8 @@
 # Contributing
 
+The main branch is **`main`**. Base new work and pull requests on `main`;
+use `git switch main` and `git pull --ff-only origin main` to update an existing clean checkout.
+
 Start with the [build guide](docs/REPRODUCING.md). Keep the app build independent
 of the research dataset. Do not commit SDK paths, signing keys, virtual
 environments, Gradle outputs or APKs; the workflow packages downloadable artifacts.

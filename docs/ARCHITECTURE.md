@@ -1,5 +1,8 @@
 # AssistiveVision — Architecture (Proposal Phase 2)
 
+The current application is maintained on **`main`**. Fixed commits in the
+benchmark guide identify historical experimental versions.
+
 This document supplies the offline-architecture specification, bundled-asset
 inventory, initialization/recovery design, device-compatibility and positioning
 guidance, audio grammar, instrumentation points, and release reproducibility
@@ -20,8 +23,8 @@ This is the implementation/design record. For current, verified build commands a
 └──────────────────────────────────────────────────────────────────────────────────┘
 
 MainViewModel pipeline (manual capture only):
-  CaptureModule (CameraX, latest frame @ ≤9 FPS, lens policy)
-    → tap Capture → frame frozen + copied
+  CaptureModule (Camera2, TextureView preview, rear ultra-wide preference)
+    → tap Capture → JPEG still decoded, rotated and frozen
     → Dispatchers.Default (pipelineMutex single-flight):
         PreprocessingModule (letterbox 448×448, LetterboxMapper geometry)
         DetectionModule (LiteRT EfficientDet-Lite2, synchronized close)
@@ -51,10 +54,8 @@ MainViewModel pipeline (manual capture only):
 
 | Module | Responsibility | Key facts |
 |--------|----------------|-----------|
-| `CaptureModule` | CameraX preview + ImageAnalysis | RGBA_8888, `STRATEGY_KEEP_ONLY_LATEST`, ≤ 9 FPS throttle, rotation applied, `imageProxy.close()` in `finally`, per-view executor |
-
-Remote shutter input: `MainActivity.dispatchKeyEvent` maps volume/camera/headset/enter keycodes (`ShutterKeyPolicy`) to `MainViewModel.captureFrame()` while the camera destination is active — Bluetooth remotes pair at the OS level, no extra permission or connectivity code.
-| `CameraLensPolicy` | Pure lens decision | Lowest focal length among back cameras (0.5× ultra-wide preferred); pure & unit-tested |
+| `CaptureModule` | Camera2 preview and JPEG still capture | Separate TextureView preview; rear ultra-wide preference with main-camera fallback; physical/logical camera paths, image rotation and frame ownership |
+| `CameraLensPolicy` | Historical pure lens helper | Retained with its unit tests; current `CaptureModule` resolves physical/logical Camera2 choices directly |
 | `PreprocessingModule` | Letterbox + tensor packing | 448×448, gray-114 padding, RGB uint8 `ByteBuffer` (allocateDirect), geometry from `LetterboxMapper`; caller-serialized via `pipelineMutex` |
 | `LetterboxMapper` | Pure geometry | Forward `Geometry(scale, dx, dy, dstW, dstH)` + exact inverse `toFrameX/Y`; floored forward / exact float inverse; round-trip tested |
 | `DetectionModule` | LiteRT inference | `TARGET_LABELS` = 10 COCO classes (ids 1,62,63,65,67,70,72,73,81,82); output tensor shape validated `[1,N,4]`; `detect()`/`close()` synchronized by `inferenceLock` + `isClosed` flag; `MAX_DETECTIONS=15` |
@@ -63,6 +64,8 @@ Remote shutter input: `MainActivity.dispatchKeyEvent` maps volume/camera/headset
 | `SpeechFormatter` / `LocalizedLabels` | Announcement text | Pure formatter + string-resource resolver (EN/ES complete) |
 | `SettingsManager` | DataStore Preferences | 5 keys: language ("es" default), confidence (0.30f), maxObjects (2), showPreview (true), speechRate (1.0f) |
 | `TtsVoiceCatalog` | Declarative voice map | Pure Kotlin; `specFor("es"|"en")`; es default; espeak asset dir + version constant |
+
+Remote shutter input: `MainActivity.dispatchKeyEvent` maps volume/camera/headset/enter keycodes (`ShutterKeyPolicy`) to `MainViewModel.captureFrame()` while the camera destination is active — Bluetooth remotes pair at the OS level, no extra permission or connectivity code.
 
 ## 3. Bundled asset inventory (Phase 2 deliverable: assets + checksums)
 

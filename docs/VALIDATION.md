@@ -1,5 +1,9 @@
 # Verified build and experiment checks
 
+The main application branch is **`main`**. The dated validation below records
+the specific historical sources checked at that time; merging into `main` does
+not turn those results into a new device test.
+
 [Home](../README.md) · [Build instructions](REPRODUCING.md) · [Benchmark](BENCHMARK.md)
 
 Validation date: **5 November 2026**, Linux x86_64. Source basis:
@@ -41,3 +45,13 @@ artifacts appear after the workflow is committed, pushed and completes on GitHub
 The local APK is in `dist/`, excluded from Git, with its current checksum, build
 manifest and signature report. Different computers can produce different signed
 APK bytes even when source and model checks pass.
+
+## Integration on main
+
+On 5 November 2026, the reproduction/documentation changes were merged into
+`main`, preserving the Camera2 changes from `7b33992`. The merged sources passed
+34 JVM tests, Android lint (zero errors, 30 warnings), `assembleDebug`,
+`assembleDebugAndroidTest`, and all 362 asset checksums. See the
+[main integration record](../development/validation/main-integration.json) and
+[build log](../development/validation/main-integration-build.log). This check
+did not execute instrumented tests or test physical camera selection.

@@ -1,5 +1,8 @@
 # AssistiveVision
 
+The main branch is **`main`**. Use it for current app builds and documentation.
+The experimental replay uses the historical commit documented in [BENCHMARK.md](docs/BENCHMARK.md).
+
 An Android research prototype that describes ten types of everyday objects in
 Spanish or English. Point the camera, press **Capture**, and hear an announcement
 with the objects and their positions. Detection and bundled speech run on the
@@ -26,7 +29,7 @@ Build-Tools 36.0.0 and Platform-Tools in Android Studio's SDK Manager. See the
 The first build needs internet to download Gradle and Maven dependencies.
 
 ```sh
-git clone https://github.com/diomedescerda/AssistiveVision.git
+git clone --branch main https://github.com/diomedescerda/AssistiveVision.git
 cd AssistiveVision
 export ANDROID_HOME="$HOME/Android/Sdk"  # replace with your SDK location
 export JAVA_HOME=/path/to/jdk-21
@@ -42,7 +45,7 @@ need not match; the manifest identifies the source and exact bundled assets.
 
 The [Android workflow](.github/workflows/android.yml) also builds the APK and
 uploads it as a GitHub Actions artifact. After a successful run, open
-**Actions → Build and verify Android APK → the run → Artifacts**, download
+**Actions → Build and verify Android APK → a successful `main` run → Artifacts**, download
 `AssistiveVision-debug-<commit>`, and extract the ZIP. Artifacts are retained for
 30 days and may require a GitHub login. They are available once the workflow has
 been committed, pushed and run successfully; there is no permanent release URL yet.
@@ -57,8 +60,10 @@ been committed, pushed and run successfully; there is no permanent release URL y
 
 Defaults: Spanish, confidence **0.30**, at most **two objects** and speech rate **1.0**.
 An external Bluetooth shutter can trigger capture after pairing in Android settings.
-The app selects the rear lens with the lowest reported focal length; availability
-of an ultra-wide camera depends on the phone's CameraX exposure of that lens.
+On `main`, Camera2 capture prefers a usable rear ultra-wide camera and falls
+back to the main rear camera. It supports direct physical cameras and logical
+multi-camera paths; availability depends on the phone. Detection uses a JPEG
+still while the live preview remains separate.
 
 Supported COCO classes: person, chair, couch, bed, dining table, toilet, TV, laptop,
 sink and refrigerator. The displayed “computer” class corresponds to COCO laptop,
@@ -89,7 +94,7 @@ outputs go to ignored `development/runs/`; APK packages remain in `dist/`.
 
 ## Development
 
-Kotlin, CameraX, LiteRT EfficientDet-Lite2, MVVM, DataStore and bundled
+Kotlin, Camera2 capture, LiteRT EfficientDet-Lite2, MVVM, DataStore and bundled
 sherpa-onnx/Piper speech. Android min SDK 26, target 36, compile 37.1;
 Gradle 9.5.0 and AGP 9.3.1 are pinned in the project.
 

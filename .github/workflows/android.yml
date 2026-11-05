@@ -2,8 +2,10 @@ name: Build and verify Android APK
 
 on:
   push:
+    branches: [main]
     paths: ['app/**', 'gradle/**', '*.gradle.kts', 'gradle.properties', 'gradlew*', 'scripts/**', 'docs/assets.sha256.json', 'docs/THIRD_PARTY.md', '.github/workflows/android.yml']
   pull_request:
+    branches: [main]
   workflow_dispatch:
 
 permissions:

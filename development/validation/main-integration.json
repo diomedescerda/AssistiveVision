@@ -1,0 +1,23 @@
+{
+  "date": "2026-11-05",
+  "branch": "main",
+  "merged_commit": "128a353dee17247fce438e43490e3dce95d74446",
+  "preserved_main_camera_commit": "7b3399201a605a2956424928999113843b898c2f",
+  "merged_reproduction_commit": "34998fdfd879841f401ae1eb66dfeb3005f3e903",
+  "gradle_tasks": [
+    ":app:testDebugUnitTest",
+    ":app:lintDebug",
+    ":app:assembleDebug",
+    ":app:assembleDebugAndroidTest"
+  ],
+  "result": "BUILD SUCCESSFUL; 29 executed, 57 up-to-date",
+  "unit_tests": 34,
+  "unit_failures": 0,
+  "unit_errors": 0,
+  "lint_errors": 0,
+  "lint_warnings": 30,
+  "asset_checksums_verified": 362,
+  "instrumentation_executed": false,
+  "physical_camera_executed": false,
+  "log": "main-integration-build.log"
+}

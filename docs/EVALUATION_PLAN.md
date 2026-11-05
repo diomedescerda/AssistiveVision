@@ -1,5 +1,8 @@
 # AssistiveVision — Evaluation Plan (Proposal Phase 3)
 
+The main application branch is **`main`**. Historical experiment snapshots are
+identified separately in [BENCHMARK.md](BENCHMARK.md).
+
 This document turns the proposal's Phase 3 activities (device-positioning
 evaluation, scenario selection, controlled experiments on occlusion/illumination/
 response time, final report) into a **reproducible protocol** with defined metrics,

@@ -1,5 +1,8 @@
 # Bundled components and attribution
 
+This component inventory accompanies the current application on **`main`**.
+A distributed APK records its exact source commit in `build-manifest.json`.
+
 The app source uses the [Apache-2.0 license](../LICENSE). Bundled models,
 voices and phonemization data retain their own terms. A debug APK is a research
 build; the label “debug” does not replace those terms.

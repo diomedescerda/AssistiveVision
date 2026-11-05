@@ -1,5 +1,8 @@
 # Intermediate development material
 
+The main application branch is **`main`**. This directory groups auxiliary
+materials; use the [main build guide](../docs/REPRODUCING.md) for the app.
+
 [Project home](../README.md)
 
 This directory groups auxiliary work outside the app's main source/build path.

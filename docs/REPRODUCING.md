@@ -1,5 +1,10 @@
 # Build AssistiveVision from a fresh clone
 
+The supported branch for the current application is **`main`**. All clone commands
+below select it explicitly. For an existing clean checkout, run `git switch main`
+and `git pull --ff-only origin main` before building. A fixed historical checkout
+for experiment replay is documented separately in [BENCHMARK.md](BENCHMARK.md).
+
 [Home](../README.md) · [Uso en español](USO.md) · [Reproduce results](BENCHMARK.md)
 
 ## What you need
@@ -32,7 +37,7 @@ it is not a repository script. See [Android SDK package management](https://deve
 ## Linux and macOS
 
 ```sh
-git clone https://github.com/diomedescerda/AssistiveVision.git
+git clone --branch main https://github.com/diomedescerda/AssistiveVision.git
 cd AssistiveVision
 export JAVA_HOME=/path/to/jdk-21
 export ANDROID_HOME="$HOME/Android/Sdk"  # macOS commonly uses $HOME/Library/Android/sdk
@@ -49,7 +54,7 @@ Replace the example JDK and SDK paths with the directories on your computer.
 ## Windows PowerShell
 
 ```powershell
-git clone https://github.com/diomedescerda/AssistiveVision.git
+git clone --branch main https://github.com/diomedescerda/AssistiveVision.git
 cd AssistiveVision
 $env:JAVA_HOME = 'C:\path\to\jdk-21'
 $env:ANDROID_HOME = "$env:LOCALAPPDATA\Android\Sdk"
@@ -57,6 +62,10 @@ $env:Path = "$env:JAVA_HOME\bin;$env:ANDROID_HOME\platform-tools;$env:Path"
 py -3.12 scripts/verify_assets.py
 py -3.12 scripts/build_apk.py
 ```
+
+For a downloadable CI build, open **Actions → Build and verify Android APK**,
+filter runs to **main**, and choose a successful run. For **Run workflow**, select
+**Branch: main**. The workflow builds pushes and pull requests targeting `main`.
 
 ## Expected output and checks
 

@@ -1,5 +1,8 @@
 # Instalar y usar AssistiveVision
 
+La rama principal de la aplicación es **`main`**. Para instalar la versión actual,
+elegir un APK construido desde esa rama.
+
 [Inicio](../README.md) · [Compilar desde código](REPRODUCING.md) · [Repetir los experimentos](BENCHMARK.md)
 
 AssistiveVision es un prototipo de investigación para Android. Al pulsar
@@ -15,7 +18,8 @@ teléfonos que solo admitan aplicaciones ARM de 32 bits.
 Para obtener el APK:
 
 1. En GitHub, abrir **Actions → Build and verify Android APK**.
-2. Elegir una ejecución completada correctamente para el commit deseado.
+2. Filtrar por la rama **main** y elegir una ejecución completada correctamente.
+   Si se ejecuta manualmente, seleccionar **Run workflow → Branch: main**.
 3. Descargar el artefacto `AssistiveVision-debug-<commit>` y descomprimirlo.
 4. Dentro está `AssistiveVision-1.0-debug.apk`, su comprobante SHA-256 y la
    identificación del código utilizado. GitHub puede pedir iniciar sesión.
@@ -63,9 +67,9 @@ a la clase COCO *laptop*. No se reconocen automáticamente todos los objetos pos
 
 Izquierda, centro y derecha se combinan con parte superior e inferior para formar
 seis zonas de la imagen. Las posiciones son relativas a donde apunta la cámara:
-no indican metros, profundidad medida ni una ruta de navegación. La selección
-automática de lente busca la focal más corta que Android exponga a CameraX;
-que un teléfono tenga lente 0,5x no garantiza que la aplicación pueda seleccionarla.
+no indican metros, profundidad medida ni una ruta de navegación. En `main`, la captura usa Camera2 y prefiere una cámara trasera ultra gran angular
+utilizable, con retorno a la cámara trasera principal. Puede consultar cámaras
+físicas y rutas multicámara lógicas; la disponibilidad de 0,5x depende del teléfono.
 
 El [estudio experimental](https://github.com/diomedescerda/indoor-detect)
 documenta aciertos, omisiones y falsos positivos. Sus fotografías se reprodujeron

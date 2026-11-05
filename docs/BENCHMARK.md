@@ -1,5 +1,9 @@
 # Reproduce the app's experimental results
 
+The current application and build guides are maintained on **`main`**. The
+reference commit below is a historical experiment snapshot; its explicit checkout
+is required for that replay and does not change the main branch.
+
 [Home](../README.md) · [Build the APK](REPRODUCING.md)
 
 The data and analysis live in
@@ -34,7 +38,7 @@ Android SDK/JDK described in [REPRODUCING.md](REPRODUCING.md). For the historica
 experiment, use a separate app checkout pinned to the reference commit:
 
 ```sh
-git clone https://github.com/diomedescerda/AssistiveVision.git AssistiveVision-reference
+git clone --branch main https://github.com/diomedescerda/AssistiveVision.git AssistiveVision-reference
 git -C AssistiveVision-reference checkout 85c852ddcb543bce1bd69ad0db307f895d597881
 cd indoor-detect
 export ANDROID_HOME="$HOME/Android/Sdk"
