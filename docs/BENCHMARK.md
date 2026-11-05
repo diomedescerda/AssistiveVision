@@ -4,7 +4,7 @@ The current application and build guides are maintained on **`main`**. The
 reference commit below is a historical experiment snapshot; its explicit checkout
 is required for that replay and does not change the main branch.
 
-[Home](../README.md) · [Build the APK](REPRODUCING.md)
+[Home](../README.md) · [Download APK](https://github.com/diomedescerda/AssistiveVision/releases/latest/download/AssistiveVision-1.0-debug.apk) · [Build the APK](REPRODUCING.md)
 
 The data and analysis live in
 [indoor-detect](https://github.com/diomedescerda/indoor-detect). They are kept out

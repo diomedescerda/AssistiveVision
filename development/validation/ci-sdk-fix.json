@@ -43,5 +43,18 @@
     "unit_failures": 0,
     "lint_errors": 0,
     "lint_warnings": 30
+  },
+  "remote_result": "success",
+  "remote_run_id": 42096695975,
+  "remote_package": {
+    "source_commit": "d78ffa7127a5e133970a50f2f941b6b3bdc20ce6",
+    "apk": {
+      "file": "AssistiveVision-1.0-debug.apk",
+      "bytes": 134267426,
+      "sha256": "883078e73596d2861029449debd796e366de4388fafe7a838c78fadef52f0820"
+    },
+    "assets_verified": 362,
+    "signature": "verified",
+    "source_clean": true
   }
 }

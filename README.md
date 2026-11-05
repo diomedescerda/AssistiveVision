@@ -8,13 +8,15 @@ Spanish or English. Point the camera, press **Capture**, and hear an announcemen
 with the objects and their positions. Detection and bundled speech run on the
 phone without an internet connection.
 
+**[Download APK for Android](https://github.com/diomedescerda/AssistiveVision/releases/latest/download/AssistiveVision-1.0-debug.apk)** · [Versions and checksums](https://github.com/diomedescerda/AssistiveVision/releases/latest)
+
 **Español:** [instalación y uso paso a paso](docs/USO.md).
 
 ## Choose your starting point
 
 | I want to… | Start here |
 |---|---|
-| Install and try the app | [Get an APK and install it](docs/USO.md#instalar-la-aplicación) |
+| Install and try the app | [Download APK](https://github.com/diomedescerda/AssistiveVision/releases/latest/download/AssistiveVision-1.0-debug.apk) · [Installation guide](docs/USO.md#instalar-la-aplicación) |
 | Build the same app from source | [Reproducible build guide](docs/REPRODUCING.md) |
 | Reproduce the experimental results | [Android replay and saved-result analysis](docs/BENCHMARK.md) |
 | Understand the implementation | [Architecture and modules](docs/ARCHITECTURE.md) |
@@ -43,12 +45,11 @@ APKs, and checks every bundled model/voice asset. The distributable is
 Rebuilding on another computer uses a different debug signing key, so APK bytes
 need not match; the manifest identifies the source and exact bundled assets.
 
-The [Android workflow in GitHub Actions](https://github.com/diomedescerda/AssistiveVision/actions/workflows/android.yml) also builds the APK and
-uploads it as a GitHub Actions artifact. After a successful run, open
-**Actions → Build and verify Android APK → a successful `main` run → Artifacts**, download
-`AssistiveVision-debug-<commit>`, and extract the ZIP. Artifacts are retained for
-30 days and may require a GitHub login. They are available once the workflow has
-been committed, pushed and run successfully; there is no permanent release URL yet.
+Published APKs are available as individual downloads on [GitHub Releases](https://github.com/diomedescerda/AssistiveVision/releases/latest).
+Each version includes the APK, checksum, build manifest, signature/metadata reports
+and licenses. The **Download APK** link above opens the current APK directly.
+[Publishing instructions](docs/RELEASES.md) explain how maintainers create a new
+version from a verified `main` build.
 
 ## Try a capture
 

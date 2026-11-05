@@ -61,9 +61,15 @@ did not execute instrumented tests or test physical camera selection.
 The first two GitHub runs stopped in SDK setup before compilation because the
 setup action default requested the retired `tools` package. Commit `d78ffa7`
 sets its package list to `platform-tools` and retains the pinned platform and
-build-tools installation. Both SDK steps pass in the
+build-tools installation. The full build and artifact upload pass in the
 [corrected main run](https://github.com/diomedescerda/AssistiveVision/actions/runs/42096695975).
 A separate clean local build of that commit completed all 87 Gradle tasks and
 passed packaged-asset, signature and APK metadata checks; its APK checksum is
 `23580339d68d1662206eef95d15864569ba896207ae9442d2918728b3a54a453`.
 See the [SDK correction record](../development/validation/ci-sdk-fix.json).
+
+## Downloadable research release
+
+The public APK is provided through [GitHub Releases](https://github.com/diomedescerda/AssistiveVision/releases/latest), with an individual [APK download](https://github.com/diomedescerda/AssistiveVision/releases/latest/download/AssistiveVision-1.0-debug.apk). Version `v1.0.0` preserves the successful CI build of `main` commit `d78ffa7127a5e133970a50f2f941b6b3bdc20ce6`. Its APK contains 134,267,426 bytes and has SHA-256 `883078e73596d2861029449debd796e366de4388fafe7a838c78fadef52f0820`. The downloaded CI package was checked against its manifest and checksum; all 362 embedded assets and its APK signature were verified before publication.
+
+See [release publication and verification](RELEASES.md) for the source snapshot, published metadata and future version procedure. The release build did not add new device or listener experiments.

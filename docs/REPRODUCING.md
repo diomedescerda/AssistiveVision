@@ -63,9 +63,10 @@ py -3.12 scripts/verify_assets.py
 py -3.12 scripts/build_apk.py
 ```
 
-For a downloadable CI build, open **Actions → Build and verify Android APK**,
-filter runs to **main**, and choose a successful run. For **Run workflow**, select
-**Branch: main**. The workflow builds pushes and pull requests targeting `main`.
+To install a published build, use **[Download APK](https://github.com/diomedescerda/AssistiveVision/releases/latest/download/AssistiveVision-1.0-debug.apk)**.
+The [release page](https://github.com/diomedescerda/AssistiveVision/releases/latest) contains its checksum, source manifest and license files.
+Maintainers publish new versions from successful `main` builds using the
+[release procedure](RELEASES.md).
 
 ## Expected output and checks
 

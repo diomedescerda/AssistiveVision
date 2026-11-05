@@ -200,6 +200,10 @@ Implemented hooks and where to measure:
 
 ## 10. Build and release reproducibility
 
+The [published APK](https://github.com/diomedescerda/AssistiveVision/releases/latest/download/AssistiveVision-1.0-debug.apk) is distributed through
+[GitHub Releases](https://github.com/diomedescerda/AssistiveVision/releases/latest). Each version includes its source manifest,
+checksum and license files. See [RELEASES.md](RELEASES.md) for publication from `main`.
+
 - Toolchain: Gradle wrapper 9.5.0 (SHA-pinned), AGP 9.3.1, JDK 21 (Android Studio JBR).
 - Dependencies pinned in `gradle/libs.versions.toml` (CameraX 1.6.1, LiteRT 1.4.2,
   sherpa-onnx v1.13.6 via JitPack, Navigation 2.7.7, DataStore 1.1.1).

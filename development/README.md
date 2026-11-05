@@ -22,3 +22,6 @@ ignored caches; those are not part of the source delivery.
 The optional slide generator writes to `development/runs/presentations/`.
 It is not required to build, install or run the app. Use the root README and
 `docs/REPRODUCING.md` for the supported build workflow.
+
+Users install the [published APK](https://github.com/diomedescerda/AssistiveVision/releases/latest/download/AssistiveVision-1.0-debug.apk).
+[Release maintenance](../docs/RELEASES.md) describes publication from `main`.
