@@ -6,8 +6,9 @@ from pptx.enum.shapes import MSO_SHAPE
 from pptx.enum.text import PP_ALIGN, MSO_ANCHOR
 from pptx.util import Inches, Pt
 
-ROOT = Path(__file__).parent
-OUT = Path(__file__).parent / "AssistiveVision_RetroalimentacionDeVoz.pptx"
+ROOT = Path(__file__).resolve().parents[2]
+OUT = ROOT / "development/runs/presentations/AssistiveVision_RetroalimentacionDeVoz.pptx"
+OUT.parent.mkdir(parents=True,exist_ok=True)
 
 NAVY = RGBColor(8, 15, 30)
 PANEL = RGBColor(15, 28, 49)

@@ -6,7 +6,7 @@ guidance, audio grammar, instrumentation points, and release reproducibility
 required by Phase 2 of the project proposal (integrated architecture, capture
 interface, DNN adaptation/integration, audio descriptor module, Android prototype).
 
-Everything here describes the **implemented** code on branch `feat/16kb-page-size`.
+This is the implementation/design record. For current, verified build commands and evidence, use [REPRODUCING.md](REPRODUCING.md), [BENCHMARK.md](BENCHMARK.md) and [VALIDATION.md](VALIDATION.md).
 
 ---
 
@@ -34,15 +34,15 @@ MainViewModel pipeline (manual capture only):
 
 **Offline guarantees, enforced structurally:**
 
-1. `AndroidManifest.xml` declares **only** `android.permission.CAMERA`. There is no
-   INTERNET permission anywhere in the merged manifest, so no component *can* open a
-   network connection.
+1. The source manifest requests `android.permission.CAMERA`. The merged debug
+   manifest also contains library-added permissions (including `ACCESS_NETWORK_STATE`),
+   but no `android.permission.INTERNET`; the app has no network socket permission.
 2. The detection model (`efficientdet-lite2-detection-metadata.tflite`, 7.2 MB) and
    both TTS voices are **bundled in the APK** under `assets/`; no downloads exist.
 3. `android.speech.tts.TextToSpeech` is **not used**; speech is synthesized in-process
    via the bundled sherpa-onnx native runtime (`com.github.k2-fsa.sherpa-onnx` AAR,
    JitPack, v1.13.6) with `abiFilters arm64-v8a` (devices) and `x86_64` (emulator).
-4. The only filesystem write is the one-time copy of the shared `espeak-ng-data`
+4. Speech initialization performs a one-time copy of the shared `espeak-ng-data`
    phonemization tree from assets to `filesDir/tts/espeak-ng-data`, guarded by a
    version marker (`tts/espeak-version.txt`); bumping `TtsVoiceCatalog.ESPEAK_DATA_VERSION`
    forces a re-copy after upgrades.
@@ -148,7 +148,7 @@ factor (DataStore default 1.0; UI exposes 0.5–2.5).
 | ABIs | arm64-v8a (physical devices), x86_64 (emulator) — both bundled |
 | Camera | Rear camera required (`uses-feature android.required=true`); 0.5× ultra-wide optional (better close-range framing) |
 | RAM | ≥ 3 GB recommended (model 7.2 MB mmap + ONNX voice ~18 MB + AudioTrack buffers) |
-| Storage | ~52 MB APK + ~17 MB internal copy of espeak data after first run |
+| Storage | Debug APK about 129 MiB, including native libraries and assets; additional internal espeak copy on first run |
 | Latency | ~138 ms single inference measured on Snapdragon 685 reference device (to be re-verified in Phase 3) |
 
 ## 7. Camera positioning and operating guidance (proposal: "phone positioning")

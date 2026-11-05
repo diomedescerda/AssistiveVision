@@ -1,0 +1,35 @@
+{
+  "date": "2026-11-05",
+  "host": "Linux x86_64",
+  "source_basis": "85c852ddcb543bce1bd69ad0db307f895d597881 plus repository usability/reproduction changes",
+  "source_snapshot": "Temporary local Git snapshot; its commit is not a published revision",
+  "clean_source_build": true,
+  "unit_tests": {
+    "tests": 34,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "lint": {
+    "errors": 0,
+    "warnings": 28
+  },
+  "asset_checksums": 362,
+  "apk_signing_verified": true,
+  "no_internet_permission": true,
+  "abis": [
+    "arm64-v8a",
+    "x86_64"
+  ],
+  "minimum_sdk": 26,
+  "apk_bytes": 134267414,
+  "clean_build_apk_sha256": "e66eb5d561cafcd4c27d0ad4c9f34bca817420f9a22f6e8bface3e44ad0a6a1a",
+  "android_replay": {
+    "frames": 198,
+    "prediction_arrays_identical": 198,
+    "summary_equal_excluding_timing": true
+  },
+  "github_actions_executed": false,
+  "offline_instrumentation_tests": 5,
+  "airplane_mode_enabled_during_instrumentation": true
+}
