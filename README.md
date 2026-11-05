@@ -43,7 +43,7 @@ APKs, and checks every bundled model/voice asset. The distributable is
 Rebuilding on another computer uses a different debug signing key, so APK bytes
 need not match; the manifest identifies the source and exact bundled assets.
 
-The [Android workflow](.github/workflows/android.yml) also builds the APK and
+The [Android workflow in GitHub Actions](https://github.com/diomedescerda/AssistiveVision/actions/workflows/android.yml) also builds the APK and
 uploads it as a GitHub Actions artifact. After a successful run, open
 **Actions → Build and verify Android APK → a successful `main` run → Artifacts**, download
 `AssistiveVision-debug-<commit>`, and extract the ZIP. Artifacts are retained for

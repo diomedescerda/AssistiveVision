@@ -17,12 +17,17 @@ teléfonos que solo admitan aplicaciones ARM de 32 bits.
 
 Para obtener el APK:
 
-1. En GitHub, abrir **Actions → Build and verify Android APK**.
+1. Abrir el workflow [Build and verify Android APK](https://github.com/diomedescerda/AssistiveVision/actions/workflows/android.yml) en GitHub Actions.
 2. Filtrar por la rama **main** y elegir una ejecución completada correctamente.
    Si se ejecuta manualmente, seleccionar **Run workflow → Branch: main**.
 3. Descargar el artefacto `AssistiveVision-debug-<commit>` y descomprimirlo.
 4. Dentro está `AssistiveVision-1.0-debug.apk`, su comprobante SHA-256 y la
    identificación del código utilizado. GitHub puede pedir iniciar sesión.
+
+En la lista de ejecuciones, el título grande corresponde al mensaje del commit;
+el nombre del workflow aparece debajo. Una cruz roja indica que la ejecución
+falló: no hay APK disponible en esa ejecución. Abrir una ejecución con marca
+verde y bajar hasta **Artifacts**; el APK está dentro del ZIP descargado.
 
 Los artefactos se conservan 30 días y aparecen después de publicar y ejecutar
 el workflow. Si no existe una ejecución disponible, [compilar desde el código](REPRODUCING.md)

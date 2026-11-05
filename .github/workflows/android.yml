@@ -25,6 +25,10 @@ jobs:
         with:
           python-version: '3.12'
       - uses: android-actions/setup-android@v3
+        with:
+          # The action default includes the retired SDK package "tools".
+          packages: platform-tools
+          log-accepted-android-sdk-licenses: false
       - name: Install pinned SDK packages
         run: sdkmanager 'platform-tools' 'platforms;android-37.1' 'build-tools;36.0.0'
       - name: Build, test, lint and verify bundled assets
