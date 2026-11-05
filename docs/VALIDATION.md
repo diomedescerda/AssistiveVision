@@ -39,9 +39,9 @@ The instrumentation confirms execution/completion of Spanish synthesis; it does
 not measure intelligibility with listeners or establish English pronunciation quality.
 Live camera quality and perception tests require their own experimental evidence.
 
-The workflows were parsed locally and the same build/analysis commands passed.
-**GitHub Actions itself has not been run for these local changes.** APK download
-artifacts appear after the workflow is committed, pushed and completes on GitHub.
+The original validation above used locally parsed workflows and local commands.
+Subsequent GitHub Actions checks are recorded separately below. APK download
+artifacts appear only after a workflow completes successfully on GitHub.
 The local APK is in `dist/`, excluded from Git, with its current checksum, build
 manifest and signature report. Different computers can produce different signed
 APK bytes even when source and model checks pass.
@@ -55,3 +55,15 @@ On 5 November 2026, the reproduction/documentation changes were merged into
 [main integration record](../development/validation/main-integration.json) and
 [build log](../development/validation/main-integration-build.log). This check
 did not execute instrumented tests or test physical camera selection.
+
+## GitHub Actions SDK setup correction
+
+The first two GitHub runs stopped in SDK setup before compilation because the
+setup action default requested the retired `tools` package. Commit `d78ffa7`
+sets its package list to `platform-tools` and retains the pinned platform and
+build-tools installation. Both SDK steps pass in the
+[corrected main run](https://github.com/diomedescerda/AssistiveVision/actions/runs/42096695975).
+A separate clean local build of that commit completed all 87 Gradle tasks and
+passed packaged-asset, signature and APK metadata checks; its APK checksum is
+`23580339d68d1662206eef95d15864569ba896207ae9442d2918728b3a54a453`.
+See the [SDK correction record](../development/validation/ci-sdk-fix.json).

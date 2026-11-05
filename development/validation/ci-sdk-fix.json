@@ -1,0 +1,47 @@
+{
+  "date": "2026-11-05",
+  "branch": "main",
+  "failed_runs": [
+    "https://github.com/diomedescerda/AssistiveVision/actions/runs/42090632497",
+    "https://github.com/diomedescerda/AssistiveVision/actions/runs/42092615668"
+  ],
+  "failed_step": "android-actions/setup-android@v3",
+  "error": "Warning: Failed to find package 'tools'",
+  "cause": "Default setup action package list includes the retired tools package",
+  "fix_commit": "d78ffa7127a5e133970a50f2f941b6b3bdc20ce6",
+  "explicit_setup_packages": [
+    "platform-tools"
+  ],
+  "pinned_packages": [
+    "platform-tools",
+    "platforms;android-37.1",
+    "build-tools;36.0.0"
+  ],
+  "new_run": "https://github.com/diomedescerda/AssistiveVision/actions/runs/42096695975",
+  "verified_setup_steps": [
+    "Run android-actions/setup-android@v3",
+    "Install pinned SDK packages"
+  ],
+  "local_clean_package": {
+    "source_commit": "d78ffa7127a5e133970a50f2f941b6b3bdc20ce6",
+    "source_worktree_changed": false,
+    "apk": {
+      "file": "AssistiveVision-1.0-debug.apk",
+      "bytes": 134267426,
+      "sha256": "23580339d68d1662206eef95d15864569ba896207ae9442d2918728b3a54a453"
+    },
+    "validation": [
+      "clean build",
+      "debug unit tests",
+      "debug Android lint",
+      "APK bundled-asset checksum comparison",
+      "APK signature verification",
+      "minimum SDK, ABIs and no INTERNET permission"
+    ],
+    "executed_gradle_tasks": 87,
+    "unit_tests": 34,
+    "unit_failures": 0,
+    "lint_errors": 0,
+    "lint_warnings": 30
+  }
+}
