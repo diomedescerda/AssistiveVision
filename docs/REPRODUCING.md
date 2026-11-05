@@ -23,6 +23,10 @@ Android Studio is convenient but not required after the SDK is installed. In
 **Settings → Languages & Frameworks → Android SDK**, note the SDK location.
 Enable **Show Package Details**, install Android API 37.1 and Build-Tools 36.0.0,
 plus Platform-Tools. Set the IDE's Gradle JDK to 21 if building inside the IDE.
+Platform 37.1 is the **compile SDK**, not the emulator image version. To use the
+SDK commands below, install **Android SDK Command-line Tools (latest)** under the
+**SDK Tools** tab. That package supplies `sdkmanager`; it is not installed by
+Platform-Tools alone.
 
 With the Android Command-Line Tools installed, the equivalent package command is:
 
@@ -35,6 +39,9 @@ Accept the SDK licenses interactively. `sdkmanager` is supplied by the SDK tools
 it is not a repository script. See [Android SDK package management](https://developer.android.com/tools/sdkmanager).
 
 ## Linux and macOS
+
+Run these commands in a terminal. After `cd AssistiveVision`, stay in that
+repository root, where `gradlew`, `app/` and `scripts/` are located.
 
 ```sh
 git clone --branch main https://github.com/diomedescerda/AssistiveVision.git
@@ -53,14 +60,16 @@ Replace the example JDK and SDK paths with the directories on your computer.
 
 ## Windows PowerShell
 
+Check `py -3 --version` first: it must report Python 3.12 or newer.
+
 ```powershell
 git clone --branch main https://github.com/diomedescerda/AssistiveVision.git
 cd AssistiveVision
 $env:JAVA_HOME = 'C:\path\to\jdk-21'
 $env:ANDROID_HOME = "$env:LOCALAPPDATA\Android\Sdk"
 $env:Path = "$env:JAVA_HOME\bin;$env:ANDROID_HOME\platform-tools;$env:Path"
-py -3.12 scripts/verify_assets.py
-py -3.12 scripts/build_apk.py
+py -3 scripts/verify_assets.py
+py -3 scripts/build_apk.py
 ```
 
 To install a published build, use **[Download APK](https://github.com/diomedescerda/AssistiveVision/releases/latest/download/AssistiveVision-1.0-debug.apk)**.
@@ -95,6 +104,20 @@ The APK contains arm64-v8a and x86_64 native libraries. It does not support
 32-bit ARM-only phones. Android 8.0 (API 26) is the declared minimum; the recorded
 validation uses the API 37 x86_64 emulator, not every Android version or phone.
 
+## Start a test device
+
+For a phone, enable Developer options and USB debugging, connect it, unlock it,
+and accept its computer-authorization prompt. For an emulator, open Android
+Studio **Tools → Device Manager → Create device**, choose a phone profile and an
+**x86_64** system image (API 26+), finish, and press its Run button. Wait for the
+Android home screen before continuing. A compile SDK installation alone does
+not create or start an emulator.
+
+Run `adb devices -l`. Continue when the selected serial has state **device**;
+`unauthorized` requires accepting the phone prompt, and `offline` requires waiting
+for startup or reconnecting. Replace `YOUR_DEVICE_SERIAL` in the install commands
+with that serial. Build first and start the emulator afterwards if host RAM is tight.
+
 ## Install and run
 
 ```sh
@@ -125,11 +148,14 @@ without staging its dataset first.
 | Symptom | Check / action |
 |---|---|
 | `SDK location not found` | Set `ANDROID_HOME` to the SDK directory, not Platform-Tools. Android Studio can also create local `local.properties`. |
+| `sdkmanager: command not found` | Install Android SDK Command-line Tools from Android Studio → SDK Manager → SDK Tools; use its `cmdline-tools/latest/bin/sdkmanager` or add that directory to your PATH. |
 | Missing platform 37.1 | Install the exact minor API in SDK Manager. Installing 36 or 37.0 alone is insufficient. |
 | Java/Gradle startup failure | Run `java -version`, set JDK 21 and retry. Gradle's daemon toolchain criteria also request 21. |
 | Gradle/JitPack download failure | The first build needs access to Google Maven, Maven Central, Gradle and JitPack. Retry after restoring connectivity; bundled model files do not remove this dependency. |
 | `INSTALL_FAILED_UPDATE_INCOMPATIBLE` | The installed app uses another signing key. Preserve its data and use another target or that original key. The scripts do not uninstall it automatically. |
 | `INSTALL_FAILED_NO_MATCHING_ABIS` | Use an arm64-v8a device or x86_64 emulator. |
+| Gradle test worker connection timeout / emulator exits with code 137 | Close the test emulator and retry the build first; then restart the emulator. Check available RAM and other heavy processes. These symptoms can reflect host resource pressure before tests run. |
+| v1.0.0 preview works but Capture stays disabled after first camera permission | Use Android Settings → Apps → AssistiveVision → Force stop, then reopen. The checked recovery preserves settings and needs no reinstallation or data reset. |
 | Camera denied / black preview | Grant camera access in Android settings; check that the target exposes a rear camera. A physical phone is preferable for live capture. |
 | No speech / long first capture | Raise media volume, wait for first voice initialization, check the visible error/status and collect `adb logcat`. No online TTS download is expected. |
 | Asset checksum mismatch | Check that the clone contains the binary files and restore from the intended commit. Do not replace the manifest just to hide a changed model. |

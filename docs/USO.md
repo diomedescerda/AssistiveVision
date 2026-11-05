@@ -13,11 +13,14 @@ inglés. El detector y las voces vienen incluidos; el uso no requiere internet.
 
 Se necesita un teléfono **Android 8.0 o posterior con procesador arm64** y cámara
 trasera. El APK universal incluye también x86_64 para emuladores. No sirve para
-teléfonos que solo admitan aplicaciones ARM de 32 bits.
+teléfonos que solo admitan aplicaciones ARM de 32 bits. El APK ocupa unos
+128 MiB e incluye el detector y las dos voces.
 
 1. Desde el teléfono, tocar **[Descargar APK](https://github.com/diomedescerda/AssistiveVision/releases/latest/download/AssistiveVision-1.0-debug.apk)**.
-2. Al terminar la descarga, abrir `AssistiveVision-1.0-debug.apk` y permitir la
-   instalación desde esa fuente si Android lo solicita.
+2. Al terminar la descarga, abrir `AssistiveVision-1.0-debug.apk` desde la
+   notificación o la carpeta Descargas. Si Android bloquea la instalación, tocar
+   **Configuración**, permitir **Instalar aplicaciones desconocidas** solo para
+   el navegador o gestor de archivos usado, volver al APK y tocar **Instalar**.
 3. Abrir AssistiveVision y conceder acceso a la cámara.
 
 En [Versiones y comprobantes](https://github.com/diomedescerda/AssistiveVision/releases/latest) se encuentran las versiones publicadas,
@@ -30,6 +33,14 @@ los datos antes de cambiar la instalación. La guía de [compilación desde cód
 explica cómo generar el paquete desde `main` y cómo instalarlo con `adb`.
 
 ## Primera captura
+
+Si Android muestra un aviso de pantalla completa, cerrarlo y conceder el permiso
+de cámara **Mientras se usa la aplicación**. Esperar a ver la imagen de cámara.
+En la versión `v1.0.0`, si la vista aparece pero **Capturar fotograma** sigue
+atenuado tras conceder el permiso por primera vez, detener la app por completo
+en **Ajustes de Android → Aplicaciones → AssistiveVision → Forzar detención** y
+volver a abrirla. Esa recuperación se comprobó sin borrar datos ni reinstalar;
+volver solo a la pantalla de inicio no equivale a detener la app.
 
 1. Abrir la aplicación y permitir el acceso a la cámara.
 2. Apuntar hacia un objeto de las clases admitidas.
@@ -45,6 +56,10 @@ desde los ajustes Bluetooth de Android y pulsarlo con la pantalla de cámara
 abierta. La compatibilidad depende de los códigos de tecla enviados por el mando.
 
 ## Ajustes
+
+Abrir **Configuración** con el botón del engranaje. Desplazar la pantalla para
+ver las opciones inferiores; los cambios se guardan automáticamente. Usar
+**Atrás** para volver a la cámara.
 
 | Ajuste | Valor inicial | Efecto |
 |---|---|---|

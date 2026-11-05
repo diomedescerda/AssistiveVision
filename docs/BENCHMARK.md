@@ -33,6 +33,10 @@ for the expected outputs and interpretation limits.
 
 ## Replay the photographs through Android
 
+Use a dedicated test target. A published APK and a locally built APK may use
+different debug certificates, so a fresh emulator avoids replacing a daily-use
+installation or its settings. The runner stops at a signing conflict.
+
 Create sibling checkouts, prepare the Python environment above, and install the
 Android SDK/JDK described in [REPRODUCING.md](REPRODUCING.md). For the historical
 experiment, use a separate app checkout pinned to the reference commit:

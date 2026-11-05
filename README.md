@@ -54,10 +54,14 @@ version from a verified `main` build.
 ## Try a capture
 
 1. Install on an **arm64 Android 8.0+ phone**, open AssistiveVision and grant camera access.
-2. Point the rear camera at a supported object, then tap **Capture**. The frame freezes,
+2. Point the rear camera at a supported object, then tap **Capture / Capturar fotograma**. The frame freezes,
    boxes show the detections, and a sentence describes their positions.
 3. Wait for the announcement to finish before capturing again.
-4. Open **Settings** to change language, voice speed, confidence, object limit or preview.
+4. Open **Settings / Configuración** (gear icon) to change language, voice speed, confidence, object limit or preview.
+
+If **Capture** stays disabled after the first camera permission grant on `v1.0.0`,
+force-close and reopen the app once; the [installation guide](docs/USO.md#primera-captura)
+includes the verified recovery.
 
 Defaults: Spanish, confidence **0.30**, at most **two objects** and speech rate **1.0**.
 An external Bluetooth shutter can trigger capture after pairing in Android settings.

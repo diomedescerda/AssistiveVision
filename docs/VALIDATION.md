@@ -73,3 +73,34 @@ See the [SDK correction record](../development/validation/ci-sdk-fix.json).
 The public APK is provided through [GitHub Releases](https://github.com/diomedescerda/AssistiveVision/releases/latest), with an individual [APK download](https://github.com/diomedescerda/AssistiveVision/releases/latest/download/AssistiveVision-1.0-debug.apk). Version `v1.0.0` preserves the successful CI build of `main` commit `d78ffa7127a5e133970a50f2f941b6b3bdc20ce6`. Its APK contains 134,267,426 bytes and has SHA-256 `883078e73596d2861029449debd796e366de4388fafe7a838c78fadef52f0820`. The downloaded CI package was checked against its manifest and checksum; all 362 embedded assets and its APK signature were verified before publication.
 
 See [release publication and verification](RELEASES.md) for the source snapshot, published metadata and future version procedure. The release build did not add new device or listener experiments.
+
+## README reader journeys checked on 5 November 2026
+
+The [combined evidence record](../development/validation/readme-e2e-20261105.json)
+covers all 16 README/LEEME files across the app and research repositories,
+including explicitly classified archives. A clean independent `main` checkout
+completed the full 87-task build, 34 JVM tests, lint with zero errors and 30
+warnings, and all 362 asset checks. Five voice/frame tests passed in a dedicated
+API 37.2 x86_64 16 KB emulator with airplane mode enabled.
+
+The public APK was downloaded completely without authentication, matched its
+published checksum, installed and launched, and detected the virtual-scene TV
+with Spanish speech synthesis. Language and object limit persisted across a cold
+restart. A local APK signed with another debug certificate was correctly rejected
+without erasing that installation; device tests used a separate emulator.
+
+**Known v1.0.0 first-launch issue:** after granting camera permission, Capture can
+remain disabled despite a working preview. Force-stopping and relaunching once restored
+capture in this test. The [use guide](USO.md#primera-captura) documents the recovery;
+this documentation change does not fix the production app itself.
+
+The companion fresh-clone runs matched 27 CSV/two JSON files and all 198 Android
+prediction arrays. The historical replay completed with the documented 16 metric
+differences. The review-page export/restore and 73-page editorial reconstruction
+also passed. Current navigation, setup, safe output paths and release rebuilding
+instructions were clarified from these checks.
+
+These are Linux/emulator checks with installed SDK and dependency caches. They
+are not Windows/macOS execution, a phone browser's package-installer flow, physical
+camera/Bluetooth validation or listener clarity measurements. Publication guidance
+was reviewed without creating an unnecessary new public release.

@@ -6,6 +6,25 @@ The application is maintained on **`main`**. Users download the APK directly fro
 Releases retain their files until a maintainer removes them. CI artifacts remain
 secondary build evidence with a 30-day retention period.
 
+## Rebuild the published v1.0.0
+
+Download `build-manifest.json` from the same version page as the APK and read
+`source_commit`. The first release `v1.0.0` was built from
+`d78ffa7127a5e133970a50f2f941b6b3bdc20ce6`, an ancestor of `main`:
+
+```sh
+git clone --branch main https://github.com/diomedescerda/AssistiveVision.git AssistiveVision-release
+cd AssistiveVision-release
+git checkout d78ffa7127a5e133970a50f2f941b6b3bdc20ce6
+```
+
+Keep this checkout. Apply only the JDK/SDK environment setup and build command
+for your operating system from the [current build guide](REPRODUCING.md); skip
+that guide's clone and `cd AssistiveVision` commands. For another version, use **its** manifest
+commit. Checking out a fixed commit leaves Git in detached-HEAD mode; that is
+expected for this separate reproduction copy. Keep ongoing development on `main`.
+The current `main` README can evolve after a released binary was built.
+
 ## Publish a new version from main
 
 1. Merge the intended app changes into `main`; update the app version and
