@@ -63,7 +63,7 @@ the proposal-revision note).
 | FR-11 | Settings persistence | Language, speech rate (0.1–3.0 applied, UI 0.5–2.5), confidence, max objects, preview toggle persist via DataStore |
 | FR-12 | Per-app language switch | EN/ES switch takes effect immediately via `AppCompatDelegate.setApplicationLocales` with `localeConfig`; spoken labels switch on the next capture |
 | FR-13 | Graceful TTS failure | If the bundled voice cannot initialize, the UI shows a localized "voice unavailable" status; captures are never stuck (watchdog + error unfreeze) |
-| FR-14 | Remote shutter trigger | A paired Bluetooth camera remote (e.g. a GorillaPod grip button) triggers capture on the camera screen: volume up/down, camera, headset, and enter keycodes map to capture; volume keys keep their default behavior outside the camera screen |
+| FR-14 | Remote shutter trigger | A paired Bluetooth camera remote (e.g. a selfie-stick shutter button) triggers capture on the camera screen: volume up/down, camera, headset, and enter keycodes map to capture; volume keys keep their default behavior outside the camera screen |
 
 ---
 

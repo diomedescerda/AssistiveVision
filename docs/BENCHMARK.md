@@ -70,9 +70,9 @@ signatures conflict. To investigate changed source/model, explicitly pass
 ## What to compare
 
 At confidence 0.30 and IoU 0.50, detector TP counts in order
-head 1x, head 0.5x, chest 1x, chest 0.5x, Gorillapod 1x, Gorillapod 0.5x are
+head 1x, head 0.5x, chest 1x, chest 0.5x, selfie stick with tripod 1x, selfie stick with tripod 0.5x are
 **56, 70, 65, 77, 75, 82**. Chest 1x has F1 **0.6190476190**;
-Gorillapod 0.5x has F1 **0.5714285714**. The latter leads count, not F1.
+selfie stick with tripod 0.5x has F1 **0.5714285714**. The latter leads count, not F1.
 
 A fresh emulator replay on 5 November 2026 returned identical prediction arrays
 for all 198 frames. Its timings changed, as expected. Do not require milliseconds
@@ -87,3 +87,7 @@ The six historical model binaries were recovered from Git history. A separate
 [recovery/replay guide](https://github.com/diomedescerda/indoor-detect/blob/main/docs/HISTORICO.md)
 records an updated-runtime replay and its differences from the published historical tables.
 The exact 198-photo Android reproduction is unaffected.
+
+The original benchmark uses the legacy key `gorillapod` for the selfie stick
+with folding tripod legs. This is the same mount; the archived identifier and
+numerical results are preserved. See the [mount-name mapping](https://github.com/diomedescerda/indoor-detect/blob/main/docs/NOMBRES_DE_MONTAJES.md).

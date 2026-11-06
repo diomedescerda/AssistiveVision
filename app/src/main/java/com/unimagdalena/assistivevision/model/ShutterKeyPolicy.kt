@@ -5,7 +5,7 @@ import android.view.KeyEvent
 /**
  * Decides which hardware key events act as the shutter.
  *
- * Bluetooth camera remotes (e.g. the button on a GorillaPod grip) pair as HID
+ * Bluetooth camera remotes (e.g. a selfie-stick shutter button) pair as HID
  * keyboards and send one of these keycodes depending on the model.
  */
 object ShutterKeyPolicy {

@@ -45,7 +45,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     /**
-     * Bluetooth shutter remotes (e.g. the button on a GorillaPod grip) pair as
+     * Bluetooth shutter remotes (e.g. a selfie-stick shutter button) pair as
      * HID keyboards and send volume/camera keycodes; on the camera screen they
      * trigger capture instead of their default behavior.
      */
