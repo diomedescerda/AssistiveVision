@@ -65,7 +65,7 @@ MainViewModel pipeline (manual capture only):
 | `SettingsManager` | DataStore Preferences | 5 keys: language ("es" default), confidence (0.30f), maxObjects (2), showPreview (true), speechRate (1.0f) |
 | `TtsVoiceCatalog` | Declarative voice map | Pure Kotlin; `specFor("es"|"en")`; es default; espeak asset dir + version constant |
 
-Remote shutter input: `MainActivity.dispatchKeyEvent` maps volume/camera/headset/enter keycodes (`ShutterKeyPolicy`) to `MainViewModel.captureFrame()` while the camera destination is active — Bluetooth remotes pair at the OS level, no extra permission or connectivity code.
+Remote shutter input: `MainActivity.dispatchKeyEvent` maps volume/camera/headset/enter keycodes (`ShutterKeyPolicy`) to `CameraFragment.capture()` while the camera destination is active — Bluetooth remotes pair at the OS level, no extra permission or connectivity code.
 
 ## 3. Bundled asset inventory (Phase 2 deliverable: assets + checksums)
 
@@ -152,15 +152,16 @@ factor (DataStore default 1.0; UI exposes 0.5–2.5).
 | Camera | Rear camera required (`uses-feature android.required=true`); 0.5× ultra-wide optional (better close-range framing) |
 | RAM | ≥ 3 GB recommended (model 7.2 MB mmap + ONNX voice ~18 MB + AudioTrack buffers) |
 | Storage | Debug APK about 129 MiB, including native libraries and assets; additional internal espeak copy on first run |
-| Latency | ~138 ms single inference measured on Snapdragon 685 reference device (to be re-verified in Phase 3) |
+| Latency | 124.9 ms isolated CPU inference in the archived Redmi Note 13 benchmark; this is not full capture-to-speech latency |
 
 ## 7. Camera positioning and operating guidance (proposal: "phone positioning")
 
 - The phone is held with the **rear camera facing the scene**, portrait, roughly
   perpendicular to the object of interest; the ultra-wide lens gives a wider
   field of view for close furniture.
-- Usable range for the 448×448 model: roughly 0.5–3 m depending on object size;
-  farther objects still announce but boxes are small and confidence drops.
+- Detection depends on apparent object size, framing, light and occlusion. The
+  study did not calibrate a physical detection range; image-relative zones do
+  not measure distance.
 - Hold the phone steady for ~1 s before Capture — the announced frame is the latest
   captured one; motion blur reduces confidence.
 - The frozen frame stays on screen with boxes until the announcement finishes, so a

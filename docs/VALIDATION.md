@@ -104,3 +104,53 @@ These are Linux/emulator checks with installed SDK and dependency caches. They
 are not Windows/macOS execution, a phone browser's package-installer flow, physical
 camera/Bluetooth validation or listener clarity measurements. Publication guidance
 was reviewed without creating an unnecessary new public release.
+
+## Reader workflows rechecked on 9 November 2026
+
+The current `main` source `b99e41971913ceaac2e5a2928c1e4053997dffba`
+was cloned from GitHub and built without pre-existing build outputs or
+`local.properties`, using JDK 21 and SDK 37.1. The build passed **34 JVM tests**,
+lint with **zero errors and 30 warnings**, app/test assembly, all **362** source
+and packaged asset hashes, signature verification and APK metadata checks.
+
+The public `v1.0.0` APK was downloaded without authentication and matched its
+published SHA-256. Its ZIP contents, including runtime bytecode and resources,
+match the clean local `main` build; the signed APK files differ. A new dedicated
+API 37.2 x86_64 emulator with 16 KB pages completed these checks with airplane
+mode enabled and Wi-Fi/mobile data disabled:
+
+| Reader action | Observed result |
+|---|---|
+| Install, open and grant camera access | Successful; Capture was enabled after permission in this run |
+| Capture with no selected detections | Returned to ready without an object announcement |
+| Detect and announce the virtual-scene TV | English and Spanish PCM generated; positive scene checks used confidence 0.10 and speech rate 2.0 |
+| Hide preview, force-stop, reopen and capture | Capture and English speech still worked |
+| Change language, rate, confidence, object cap and preview | All five settings survived a cold restart |
+| Fullscreen and hardware shutter key | Controls toggled; injected camera keycode 27 triggered Spanish capture |
+| Deny camera permission | Capture disabled with the localized permission explanation |
+| Install a differently signed local APK over the public APK | Rejected with `INSTALL_FAILED_UPDATE_INCOMPATIBLE`; public installation preserved |
+
+The virtual TV scored below the default 0.30 in these captures. Lowering the
+threshold exercised the positive speech path; it is not a new detection-accuracy
+study or evidence that every object is recognized. The first-permission issue
+recorded on 5 November was not reproduced in this run; its recovery instructions
+remain available for affected installations.
+
+On a separate dedicated emulator, the documented command passed **five offline
+voice/frame-store instrumentation tests**. A separate checkout of historical
+commit `85c852ddcb543bce1bd69ad0db307f895d597881` replayed all **198** study
+photographs: every prediction array and all non-timing summary values matched
+the reference. Saved-result analysis matched **27 CSV and two JSON files**.
+
+The [complete evidence record](../development/validation/readme-e2e-20261109.json),
+[build log](../development/validation/readme-e2e-20261109/app-build.log),
+[offline test log](../development/validation/readme-e2e-20261109/offline-instrumentation.log)
+and [live app log](../development/validation/readme-e2e-20261109/public-app-logcat.txt)
+preserve the checks. SDK, dependency downloads and research Git objects were
+cached; the research clone was dissociated and all environments/results were new.
+
+The author confirms successful use on their Redmi Note 13. No physical phone was
+connected during this audit, so that report is distinct from these emulator
+checks. Physical Bluetooth pairing, Windows/macOS, listener comprehension and
+Word desktop Zotero refresh were not executed here. App production code and the
+published release were not changed by this documentation verification.

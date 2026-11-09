@@ -9,8 +9,9 @@ decision, and risk/ethics planning required by Phase 1 of the project proposal
 (literature/problem analysis, requirements & conceptual design, DNN selection,
 priority-object definition, audio descriptor design).
 
-Status: **implemented baseline** — every requirement below is either implemented in
-this repository or explicitly listed as a documented limitation / user-side activity.
+Status: **implementation and acceptance targets**. The tables distinguish desired
+criteria from recorded checks. Use [VALIDATION.md](VALIDATION.md) for the commands,
+versions and targets actually exercised; an acceptance target is not a measured result.
 
 ---
 
@@ -59,7 +60,7 @@ the proposal-revision note).
 | FR-7 | Localized speech | Object names and zones are spoken in the selected language (Spanish default); sentence assembly is pure (`SpeechFormatter`) and unit-tested |
 | FR-8 | Overlay | Bounding boxes + label tags are drawn over the frozen frame using the same letterbox geometry forward and inverse (round-trip tested) |
 | FR-9 | Camera permission gating | The camera never binds before `CAMERA` is granted; denial is explained in-app in the UI language |
-| FR-10 | Lens selection | The back camera with the lowest focal length is chosen (0.5× ultra-wide when present), so close objects fill the frame |
+| FR-10 | Lens selection | Camera2 prefers a usable rear ultra-wide through direct physical or logical camera paths, with main-camera fallback; the available field of view depends on the phone |
 | FR-11 | Settings persistence | Language, speech rate (0.1–3.0 applied, UI 0.5–2.5), confidence, max objects, preview toggle persist via DataStore |
 | FR-12 | Per-app language switch | EN/ES switch takes effect immediately via `AppCompatDelegate.setApplicationLocales` with `localeConfig`; spoken labels switch on the next capture |
 | FR-13 | Graceful TTS failure | If the bundled voice cannot initialize, the UI shows a localized "voice unavailable" status; captures are never stuck (watchdog + error unfreeze) |
@@ -71,15 +72,15 @@ the proposal-revision note).
 
 | ID | Requirement | Acceptance criterion |
 |----|-------------|----------------------|
-| NFR-1 | **Fully offline** | Manifest declares only `android.permission.CAMERA` — **no INTERNET permission**. All inference and speech synthesis happen on-device from bundled assets. Verified by airplane-mode test (see Evaluation Plan §5) |
-| NFR-2 | End-to-end response time | Capture → speech completion completes within ~2.5 s p95 on the reference device (inference ~138 ms + short utterance synthesis); measured in Phase 3 |
+| NFR-1 | **Fully offline** | The merged APK has no `android.permission.INTERNET`; library-added permissions are listed in the APK metadata. Inference and speech use bundled assets; airplane-mode checks are recorded in VALIDATION.md |
+| NFR-2 | End-to-end response time | Acceptance target: capture → speech completion within 2.5 s at P95. This complete interval has not been measured by the archived detector replay; isolated inference times do not establish it |
 | NFR-3 | No stuck captures | A capture always resolves: success, empty result, TTS error, or 20 s watchdog timeout releases the UI |
-| NFR-4 | Crash safety | Interpreter close is synchronized with in-flight inference; ImageProxy close is in `finally`; bitmap access is `@Volatile`/copied |
+| NFR-4 | Crash safety | Interpreter close is synchronized with in-flight inference; JPEG images close in `finally`; FrameStore serializes frame ownership and copies frozen bitmaps |
 | NFR-5 | Privacy | No image, audio, or usage data leaves the device; nothing is written to shared storage; no analytics, ads, or third-party SDKs that phone home |
-| NFR-6 | Install size budget | Voice + model assets ≤ 60 MB; release APK ≤ 120 MB (actual: assets 52.4 MB, release APK ≈ 118 MB) |
+| NFR-6 | Install size budget | Target: bundled assets ≤ 60 MiB and optimized release APK ≤ 120 MiB. Current bundled assets total 59.6 MiB; the published debug APK is approximately 128.0 MiB. Debug and optimized release packages have different size budgets |
 | NFR-7 | Compatibility | minSdk 26; ABIs arm64-v8a (physical) + x86_64 (emulator); runs on Android 8.0+ |
 | NFR-8 | Release hardening | R8 minification + resource shrinking; reproducible signing via `keystore.properties` with debug fallback |
-| NFR-9 | Automated quality gates | Unit tests, lint (0 errors), debug + release builds all green in CI/local verification |
+| NFR-9 | Automated quality gates | The supported build runs unit tests, lint with zero errors, debug app/test assembly, asset hashes, signature and APK metadata checks; release optimization requires its own build verification |
 
 ---
 
@@ -99,7 +100,7 @@ labels used by the model output):
 | table | 67 | ≈ desks | COCO has no separate "desk"; dining/work tables are the nearest supported class — **documented limitation** |
 | toilet | 70 | — | Orientation landmark |
 | tv | 72 | — | Appliances/screens |
-| computer | 73 | — | Laptops/desktops |
+| computer | 73 | — | COCO laptop; this label does not cover every desktop computer |
 | sink | 81 | — | Kitchen/bathroom landmark |
 | refrigerator | 82 | — | Appliances |
 
@@ -115,25 +116,29 @@ nearest-class behavior documented here.
 
 **Choice:** EfficientDet-Lite2 (TensorFlow Lite / LiteRT), input 448×448.
 
-Rationale against the alternatives considered during Phase 1:
+The archived comparison evaluated six configurations of four model families:
 
 | Option | Why / why not |
 |--------|---------------|
-| EfficientDet-Lite0/Lite1 | Smaller/faster but lower accuracy on small indoor objects; Lite2 keeps ~138 ms single-shot latency on the reference device while staying on-device |
-| EfficientDet-Lite3/Lite4 | Better mAP but noticeably slower on mid-range phones and larger APK; exceeds the NFR-2 budget on low-end hardware |
-| YOLO-family TFLite exports | Faster but the available metadata-compatible export pipeline and COCO label conventions of the chosen artifact were cleaner for this project; can be revisited |
-| SSD MobileNet | Weaker accuracy/size tradeoff at 448-class granularity |
+| EfficientDet-Lite2 | Selected compromise: desktop mAP50 0.648 and F1 0.695, with 124.9 ms isolated CPU inference on the archived Redmi Note 13 run |
+| YOLOv8s Float32/Float16 | Higher desktop F1 (0.702) and mAP50-95 (0.514), with isolated Android CPU times of 620.8/622.1 ms |
+| YOLO11n Float32/Float16 | Android CPU times of 188.6/198.1 ms and desktop F1 of 0.667/0.662 |
+| SSD MobileNetV1 | Lowest archived CPU time (23.4 ms), with lower desktop recall (0.545) and F1 (0.421) |
 
-**Selection protocol (reproducible).** Model choice is justified by (a) the official
-model card / published mAP, (b) on-device single-inference latency on the reference
-device (see README Performance — to be re-verified in Phase 3 per the Evaluation
-Plan, not treated as final), and (c) asset size budget NFR-6. The shipped artifact is
+The [desktop results](https://github.com/diomedescerda/indoor-detect/blob/main/Build/models_comparison/results/desktop.md)
+and [Redmi CPU/GPU results](https://github.com/diomedescerda/indoor-detect/blob/main/Build/models_comparison/results/android.md)
+preserve those historical measurements. EfficientDet-Lite2 reduces the detector
+wait compared with YOLOv8s while retaining the selected detection performance;
+the full camera-to-speech interval also includes capture, preparation and audio.
+The [historical replay guide](https://github.com/diomedescerda/indoor-detect/blob/main/docs/HISTORICO.md)
+records updated-runtime differences and the limits of repeating the old phone timings.
+The shipped artifact is
 `app/src/main/assets/efficientdet-lite2-detection-metadata.tflite`
 (SHA-256 `6fd32c84…6bd52`, full hash in `docs/ARCHITECTURE.md` §3).
 
-**Confidence threshold selection.** Default 0.30 balances missed objects vs. false
-announcements for assistive use; Phase 3 sweeps 0.10–0.90 to plot the precision/recall
-trade-off and validate (or revise) the default with data.
+**Confidence threshold.** Default 0.30 is the operating point used in the archived
+analysis. The interface exposes 0.10–0.90. A threshold sweep is a possible follow-up;
+the existing evidence does not establish an optimal threshold for every scene.
 
 ---
 
@@ -174,7 +179,7 @@ items. Full spec in `docs/ARCHITECTURE.md` §8.
 
 ## 7. Privacy, data handling, and network policy
 
-- **Permissions:** `CAMERA` only. No INTERNET, no microphone, no location, no storage.
+- **Permissions:** the source requests `CAMERA`; the merged APK includes library-added permissions listed in its metadata. It has no INTERNET, microphone, location or shared-storage permission.
 - **Camera frames** exist only in process memory (latest-frame slot + one frozen
   copy during a capture); they are never written to disk and never leave the device.
 - **Settings** (language, rate, confidence, max objects, preview) are stored locally

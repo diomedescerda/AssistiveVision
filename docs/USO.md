@@ -51,6 +51,12 @@ La primera inicialización de voz puede tardar más. Si no se oye, comprobar el
 volumen multimedia y el mensaje de estado. La aplicación no necesita descargar
 voces del servicio de texto a voz del teléfono.
 
+Si no se selecciona ningún objeto, la captura vuelve al estado listo y no genera
+una descripción de objetos. Volver a apuntar hacia una clase admitida, mejorar el
+encuadre o revisar el umbral en Configuración. Bajar la confianza puede recuperar
+más detecciones y también aceptar más errores; la app no identifica todos los
+objetos en cada captura.
+
 Un disparador Bluetooth de cámara puede activar la captura: emparejarlo primero
 desde los ajustes Bluetooth de Android y pulsarlo con la pantalla de cámara
 abierta. La compatibilidad depende de los códigos de tecla enviados por el mando.

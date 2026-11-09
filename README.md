@@ -12,6 +12,10 @@ phone without an internet connection.
 
 **Español:** [instalación y uso paso a paso](docs/USO.md).
 
+The [9 November 2026 verification](docs/VALIDATION.md#reader-workflows-rechecked-on-9-november-2026)
+repeated a clean build, public APK installation, offline captures and Spanish/English
+speech, settings persistence, and the 198-photo reference replay on dedicated emulators.
+
 ## Choose your starting point
 
 | I want to… | Start here |
